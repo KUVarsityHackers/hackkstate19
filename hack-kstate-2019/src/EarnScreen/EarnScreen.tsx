@@ -34,7 +34,7 @@ function EarnScreen (props: any) {
                 }
             }));
             const  response = await request.json();
-            sessionId = response.code;
+            sessionId = response;
         } catch (error) {
             console.error('Error:', error);
           }
