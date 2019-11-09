@@ -9,14 +9,15 @@
     "start": "node server.js",
     "build": "cd hack-kstate-2019/ && yarn build",
     "deploy": "gcloud app deploy",
-    "test": "repo-tools test app -- server.js"
+    "test": "repo-tools test app -- server.js",
+    "buildstart": "yarn build && yarn start"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/GoogleCloudPlatform/nodejs-docs-samples.git"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=12.0.0"
   },
   "author": "Google Inc.",
   "license": "Apache-2.0",

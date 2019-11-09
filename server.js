@@ -1,17 +1,19 @@
-import uniqid from "uniqid";
-import express from "express";
-import path from "path";
-import body_parser from "body-parser";
-import { Wallet, XRPAmount, XpringClient, Utils } from "xpring-js"
-
 
 // [START app]
+const express = require('express');
+const path = require('path');
+const body_parser = require('body-parser');
+const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
+const uniqid = require('uniqid')
+
 const app = express();
 
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
 
+const sessions = [];
+const instructors = {};
 
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
@@ -68,20 +70,24 @@ stopMoneyStream(x);
 
 
 app.post("/session", (req, res) => {
-<<<<<<< Updated upstream
+
   const {instructor, subject, title, price} = req.body;
+
+  const sessionID = uniqid();
+
   const item = {
     subject,
     title,
     price,
-    instructor
+    instructor,
+    id: sessionID
   }
-=======
-  const item = {name, subject, title, price} = req.body;
-  const sessionID = uniqid();
->>>>>>> Stashed changes
-  sessions.push(item)
-  res.json({code: "AWBSEW"});
+  if(!instructors[instructor.publickey]) {
+    instructors[instructor.publickey] = {name: instructor.name, sessionID}
+  }
+  sessions.push(item);
+
+  res.json(sessionID);
 });
 
 app.get("/session", (req, res) => {

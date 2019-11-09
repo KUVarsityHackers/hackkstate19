@@ -33,7 +33,7 @@ function EarnScreen (props: any) {
                 }
             }));
             const  response = await request.json();
-            sessionId = response.code;
+            sessionId = response;
             console.log("\n\n\n\n\n\n\n\n\t");
             console.log(sessionId);
             console.log("\n\n\n\n\n\n\n\n");
