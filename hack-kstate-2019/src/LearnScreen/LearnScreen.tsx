@@ -5,7 +5,7 @@ import EmptyBalance from './EmptyBalance';
 import LearnStream from './LearnStream';
 
 function LearnScreen () {
-    const [streamId, setStreamId] = useState(0);
+    const [streamId, setStreamId] = useState(-1);
     const selectStream = (streamId: number) => {
         setStreamId(streamId);
     };
@@ -34,7 +34,7 @@ function LearnScreen () {
           .then(result => {setWallet(result.wallet)});
     })
 
-    if (!streamId){
+    if (streamId < 0){
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
