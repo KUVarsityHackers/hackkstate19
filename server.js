@@ -33,21 +33,22 @@ readInterface.on('line', function(line) {
 app.use(body_parser.json());
 
 // returns a new wallet WORKING
-const createNewWallet = () => {
+const reserveWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   let newWallet = generationResult.wallet;
   used_wallets[newWallet.getAddress()] = newWallet;
   return newWallet.getAddress();
 }
 
-//returns balance of a given address WORKING
-//can throw, returns a bigint
-const getBalance = async (address) => {
+//returns available balance of a given address in XRP
+const getAvailableBalance = async (address) => {
   if(!addressValid(address)) {
     return "Invalid address";
   }
-  console.log("Valid addr " + address);
-  return await xpringClient.getBalance(address);
+  const balDrops = await xpringClient.getBalance(address);
+  const balXRP = Number(balDrops)/1000000;
+  const availableBalance = balXRP - 20;
+  return availableBalance;
 }
 
 //returns whether the given address is valid WORKING
@@ -56,14 +57,17 @@ const addressValid = (address) => {
 }
 
 //sends transfer_amount form wallet_from to address_to
-//can throw
 const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(!addressValid(address_to) || !addressValid(wallet_from.getAddress())) {
     throw "Invalid address";
   }
-  console.log("Valid addr " + address_to + " and " + wallet_from.getAddress());
+  if(getAvailableBalance(wallet_from.getAddress()) < transfer_amount) {
+    throw "Insufficient funds";
+  }
+  
   const amount =  new XRPAmount();
   amount.setDrops(transfer_amount);
+
   return await xpringClient.send(amount, address_to, wallet_from);  
 }
 
@@ -86,7 +90,7 @@ app.post("/session", (req, res) => {
   }
 
   sessions.set(id, session);
-  res.json(sessionID);
+  res.json(id);
 });
 
 app.get("/session", (req, res) => {
@@ -107,11 +111,11 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const {sessionId, address} = req.params;
   const mySession = sessions.get(sessionId)
   if(address !== mySession.instructor.address) {
-    const amtDrops = Number(mySession.price)*1000000;
+    let balXRP;
     try{
-      const result = await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
+      await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
       const balDrops = await getBalance(address);
-      const balXRP = balDrops/1000000;
+      balXRP = balDrops/1000000;
     } catch(e) {
       res.send(e);
     }
