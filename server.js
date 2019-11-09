@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 5000;
-
-// console.log that your server is up and running
-app.listen(port, () => console.log(`Listening on port ${port}`));
-
-// create a GET route
-app.get('/express_backend', (req, res) => {
-  res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
-});
-=======
 /**
  * Copyright 2018, Google, Inc.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,4 +38,3 @@ app.listen(PORT, () => {
 // [END app]
 
 module.exports = app;
->>>>>>> 12d38ef8c1d43c383dbdf65ee497fdb6caa1bd4f
