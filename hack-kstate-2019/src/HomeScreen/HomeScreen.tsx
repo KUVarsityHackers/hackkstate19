@@ -7,14 +7,14 @@ function HomeScreen (props: any) {
     return (
         <div className="Splash">
 
-            <header className="App-header">
+            <div className="App-header">
 
                 <p>Name</p>
-            </header>
-            <body className="App-Body">
+            </div>
+            <div className="App-Body">
                 <button style={homePageButton} onClick={() => props.onPageChange(PageEnum.LEARN)}> Learn </button>
                 <button style={homePageButton} onClick={() => props.onPageChange(PageEnum.EARN)}> Earn </button>               
-            </body>
+            </div>
 
         </div>
     );
