@@ -5,6 +5,9 @@ import ContentArea from './ContentArea';
 function App() {
   return (
     <div className="App">
+      <div className="App-header">
+        <p>Name</p>
+      </div>
       <ContentArea/>
     </div>
   );

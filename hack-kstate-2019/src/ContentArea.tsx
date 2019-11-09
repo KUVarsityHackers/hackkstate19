@@ -14,7 +14,7 @@ function ContentArea() {
         
         case PageEnum.LEARN:
             return(
-                <LearnScreen onPageChange={onPageChange}/>
+                <LearnScreen/>
             );
         case PageEnum.EARN:
             return(
