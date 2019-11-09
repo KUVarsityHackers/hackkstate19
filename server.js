@@ -3,10 +3,10 @@
 const express = require('express');
 const path = require('path');
 const body_parser = require('body-parser');
-const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js');
-const uniqid = require('uniqid');
+const HashMap = require('hashmap')
+const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
+const uniqid = require('uniqid')
 const fs = require('fs');
-const readline = require('readline');
 
 const app = express();
 
@@ -16,10 +16,8 @@ const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 const unused_wallets = [];
 const used_wallets = [];
 
-const sessions = [];
-const instructors = {};
-
-const dest_address = [];
+const sessions = new HashMap();
+const instructors = new HashMap();
 
 const readInterface = readline.createInterface({
   input: fs.createReadStream('seeds.txt')
@@ -33,7 +31,7 @@ readInterface.on('line', function(line) {
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
 
-//returns a new wallet WORKING
+// returns a new wallet WORKING
 const createNewWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   let newWallet = generationResult.wallet;
@@ -83,45 +81,42 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
 // }
 
 app.post("/session", (req, res) => {
-
   const {instructor, subject, title, price} = req.body;
+  const {address, name} = instructor;
+  const id = uniqid();
 
-  const sessionID = uniqid();
-
-  const item = {
-    subject,
+  const session = {
+    instructor: {address, name},
     title,
+    subject,
     price,
-    instructor,
-    id: sessionID
+    subject,
+    id
   }
-  if(!instructors[instructor.publickey]) {
-    instructors[instructor.publickey] = {name: instructor.name, sessionID}
-  }
-  sessions.push(item);
-  dest_address[sessionID] = item;
 
+  if(!instructors.has(address)) {
+    instructors.set(address, {address, name});
+  }
+
+  sessions.set(id, session);
   res.json(sessionID);
 });
 
 app.get("/session", (req, res) => {
-  res.json(sessions);
+  res.json(sessions.values());
 });
 
-// Serve the static files from the React app
-app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
-
-app.post('/balance', async (req,res) => {
-  const {addr} = req.body;
+app.get('/balance/:address', async (req,res) => {
+  const {address} = req.params;
   try{
-    const x = Number(await getBalance(addr));
-    res.send(String(x/1000000));
+    const balDrops = Number(await getBalance(address));
+    res.send(balDrops/1000000);
   } catch(e) {
-    console.log(e);
     res.send(e);
   }
 });
 
+<<<<<<< Updated upstream
 app.post('/pay', async (req,res) => {
   const {sessionID, src_addr} = req.body;
   const amtDrops = Number(dest_address[sessionID].price)*1000000;
@@ -131,13 +126,29 @@ app.post('/pay', async (req,res) => {
     res.send(String(balXRP/1000000));
   } catch(e) {
     res.send(e);
+=======
+app.get('/session/:sessionId/address/:address/', async (req,res) => {
+  const {sessionId, address} = req.params;
+  const mySession = sessions.get(sessionId)
+  if(address !== mySession.instructor.address) {
+    const amtDrops = Number(mySession.price)*1000000;
+    try{
+      const result = await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
+      const balDrops = await getBalance(address);
+      const balXRP = balDrops/1000000;
+    } catch(e) {
+      res.send(e);
+    }
+>>>>>>> Stashed changes
   }
+  res.send(balXRP);
 });
 
-app.get('/wallet/reserve', (req,res) => {
-  res.send(createNewWallet());
+app.get('/wallet', (req,res) => {
+  res.send(reserveWallet());
 });
 
+<<<<<<< Updated upstream
 // app.post('/startstream', (req,res) => {
 //   const {session_id, src_pub_key} = req.body;;
 //   running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, used_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
@@ -149,6 +160,10 @@ app.get('/wallet/reserve', (req,res) => {
 //   stopMoneyStream(running_streams[src_pub_key]);
 //   res.send(src_pub_key);
 // });
+=======
+// Serve the static files from the React app
+app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
+>>>>>>> Stashed changes
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) => {
