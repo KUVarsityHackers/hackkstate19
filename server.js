@@ -8,11 +8,14 @@ const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
 const uniqid = require('uniqid')
 const fs = require('fs');
 const readline = require('readline');
+const {Encode, Decode} = require('xrpl-tagged-address-codec')
 
 const app = express();
 
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
+
+const TEST_NET = true;
 
 const unused_wallets = [];
 const used_wallets = [];
@@ -30,7 +33,7 @@ readInterface.on('line', function(line) {
 });
 
 // parse JSON (application/json content-type)
-app.use(body_parser.json());
+// app.use(body_parser.json());
 
 // returns a new wallet WORKING
 const reserveWallet = () => {
@@ -40,12 +43,23 @@ const reserveWallet = () => {
   return newWallet.getAddress();
 }
 
+const convertAddress = (address) => (address.charAt(0) == 'r') ? Encode({account: address, testnet: TEST_NET}) : address
+
 //returns available balance of a given address in XRP
 const getAvailableBalance = async (address) => {
+  address = convertAddress(address);
+
   if(!addressValid(address)) {
     return "Invalid address";
   }
-  const balDrops = await xpringClient.getBalance(address);
+  let balDrops;
+  try {
+    balDrops = await xpringClient.getBalance(address);
+  }
+  catch (e) {
+    console.log(e);
+  }
+  
   const balXRP = Number(balDrops)/1000000;
   const availableBalance = balXRP - 20;
   return availableBalance;
@@ -53,11 +67,13 @@ const getAvailableBalance = async (address) => {
 
 //returns whether the given address is valid WORKING
 const addressValid = (address) => {
+  address = convertAddress(address);
   return Utils.isValidAddress(address);
 }
 
 //sends transfer_amount form wallet_from to address_to
 const sendRipple = async (address_to, wallet_from, transfer_amount) => {
+  address_to = convertAddress(address_to);
   if(!addressValid(address_to) || !addressValid(wallet_from.getAddress())) {
     throw "Invalid address";
   }
@@ -98,14 +114,11 @@ app.get("/session", (req, res) => {
 });
 
 app.get('/balance/:address', async (req,res) => {
-  const {address} = req.params;
-  console.log(address);
+  let {address} = req.params;
   try{
     const bal = Number(await getAvailableBalance(address));
-    console.log(bal);
     res.send(String(bal));
   } catch(e) {
-    console.log(e);
     res.send(e);
   }
 });
