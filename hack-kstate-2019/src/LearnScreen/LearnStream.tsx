@@ -1,10 +1,11 @@
 import React from 'react';
 import '../App.css';
+import Stream from 'src/Stream';
 
 function LearnStream (props: any) {
     return(
         <div>
-            Stream {props.streamId} not implemented
+            <Stream session={props.streamId}/>
         </div>
     );
 }
