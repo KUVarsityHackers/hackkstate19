@@ -22,8 +22,7 @@ function ContentArea() {
             );
         default:
             return(
-                <LearnScreen onPageChange={onPageChange}/>
-                //<HomeScreen onPageChange={onPageChange}/>
+                <HomeScreen onPageChange={onPageChange}/>
             );
     }
 }
