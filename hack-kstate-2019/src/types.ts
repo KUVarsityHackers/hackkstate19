@@ -7,5 +7,5 @@ export interface ISession {
 }
 export interface IInstructor {
     name: string;
-    publickey: string;
+    address: string;
 }
