@@ -99,10 +99,13 @@ app.get("/session", (req, res) => {
 
 app.get('/balance/:address', async (req,res) => {
   const {address} = req.params;
+  console.log(address);
   try{
-    const balDrops = Number(await getBalance(address));
-    res.send(balDrops/1000000);
+    const bal = Number(await getAvailableBalance(address));
+    console.log(bal);
+    res.send(String(bal));
   } catch(e) {
+    console.log(e);
     res.send(e);
   }
 });
@@ -113,7 +116,7 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   if(address !== mySession.instructor.address) {
     try{
       await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
-      const balDrops = await getBalance(address);
+      const balDrops = await getAvailableBalance(address);
       res.send(balDrops/1000000);
     } catch(e) {
       res.send(e);
