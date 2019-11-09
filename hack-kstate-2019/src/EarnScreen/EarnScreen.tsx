@@ -14,12 +14,13 @@ function EarnScreen (props: any) {
     const onSubmit =  async ( {name, publickey, title, subject, price}:any) => {
         const convertedValues: ISession = { instructor: {
                                                         name,
-                                                        id: null,
                                                         publickey
                                                     },
                                             title,
                                             subject,
-                                            price};
+                                            price,
+                                            id: null
+                                        };
         console.log(convertedValues);
         const url = 'session';
         const data = convertedValues;
@@ -34,9 +35,6 @@ function EarnScreen (props: any) {
             }));
             const  response = await request.json();
             sessionId = response.code;
-            console.log("\n\n\n\n\n\n\n\n\t");
-            console.log(sessionId);
-            console.log("\n\n\n\n\n\n\n\n");
         } catch (error) {
             console.error('Error:', error);
           }

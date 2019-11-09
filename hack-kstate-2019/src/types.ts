@@ -3,9 +3,9 @@ export interface ISession {
     title: string;
     subject: string;
     price: string;
+    id:string | null;
 }
 export interface IInstructor {
     name: string;
-    id: string | null;
-    publickey?: string;
+    publickey: string;
 }
