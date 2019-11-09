@@ -111,16 +111,14 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const {sessionId, address} = req.params;
   const mySession = sessions.get(sessionId)
   if(address !== mySession.instructor.address) {
-    let balXRP;
     try{
       await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
       const balDrops = await getBalance(address);
-      balXRP = balDrops/1000000;
+      res.send(balDrops/1000000);
     } catch(e) {
       res.send(e);
     }
   }
-  res.send(balXRP);
 });
 
 app.get('/wallet', (req,res) => {
