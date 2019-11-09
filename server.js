@@ -3,30 +3,39 @@
 const express = require('express');
 const path = require('path');
 const body_parser = require('body-parser');
+const HashMap = require('hashmap')
 const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
 const uniqid = require('uniqid')
+const fs = require('fs');
 
 const app = express();
 
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
-const sessions = [];
-const instructors = {};
+const unused_wallets = [];
+const used_wallets = [];
 
-const src_wallets = [];
-const dest_address = [];
-const running_streams = [];
+const sessions = new HashMap();
+const instructors = new HashMap();
 
+const readInterface = readline.createInterface({
+  input: fs.createReadStream('seeds.txt')
+});
+
+readInterface.on('line', function(line) {
+  const w = Wallet.generateWalletFromMnemonic(line);
+  unused_wallets.push(w);
+});
 
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
 
-//returns a new wallet WORKING
+// returns a new wallet WORKING
 const createNewWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   let newWallet = generationResult.wallet;
-  src_wallets[newWallet.getAddress()] = newWallet;
+  used_wallets[newWallet.getAddress()] = newWallet;
   return newWallet.getAddress();
 }
 
@@ -59,81 +68,76 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
 
 //starts the money stream from wallet_from to addr_to at rate per minute
 //Can throw
-const startMoneyStream = (addr_to, wallet_from, rate) => {
-  const tickerInterval = setInterval(() => {
-    sendRipple(addr_to, wallet_from, rate);
-  }, 60000);
-  return tickerInterval;
-}
+// const startMoneyStream = (addr_to, wallet_from, rate) => {
+//   const tickerInterval = setInterval(() => {
+//     sendRipple(addr_to, wallet_from, rate);
+//   }, 60000);
+//   return tickerInterval;
+// }
 
-//clears the ticker interval
-const stopMoneyStream = (moneyStream) => {
-  clearInterval(moneyStream);
-}
+// //clears the ticker interval
+// const stopMoneyStream = (moneyStream) => {
+//   clearInterval(moneyStream);
+// }
 
 app.post("/session", (req, res) => {
-
   const {instructor, subject, title, price} = req.body;
+  const {address, name} = instructor;
+  const id = uniqid();
 
-  const sessionID = uniqid();
-
-  const item = {
-    subject,
+  const session = {
+    instructor: {address, name},
     title,
+    subject,
     price,
-    instructor,
-    id: sessionID
+    subject,
+    id
   }
-  if(!instructors[instructor.publickey]) {
-    instructors[instructor.publickey] = {name: instructor.name, sessionID}
-  }
-  sessions.push(item);
 
+  if(!instructors.has(address)) {
+    instructors.set(address, {address, name});
+  }
+
+  sessions.set(id, session);
   res.json(sessionID);
 });
 
 app.get("/session", (req, res) => {
-  res.json(sessions);
+  res.json(sessions.values());
+});
+
+app.get('/balance/:address', async (req,res) => {
+  const {address} = req.params;
+  try{
+    const balDrops = Number(await getBalance(address));
+    res.send(balDrops/1000000);
+  } catch(e) {
+    res.send(e);
+  }
+});
+
+app.get('/session/:sessionId/address/:address/', async (req,res) => {
+  const {sessionId, address} = req.params;
+  const mySession = sessions.get(sessionId)
+  if(address !== mySession.instructor.address) {
+    const amtDrops = Number(mySession.price)*1000000;
+    try{
+      const result = await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
+      const balDrops = await getBalance(address);
+      const balXRP = balDrops/1000000;
+    } catch(e) {
+      res.send(e);
+    }
+  }
+  res.send(balXRP);
+});
+
+app.get('/wallet', (req,res) => {
+  res.send(reserveWallet());
 });
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
-
-app.post('/checkbalance', async (req,res) => {
-  const {addr} = req.body;
-  try{
-    const x = Number(await getBalance(addr));
-    res.send(String(x/1000000));
-  } catch(e) {
-    console.log(e);
-    res.send(e);
-  }
-});
-
-app.post('/send', async (req,res) => {
-  const {dest, src, amt} = req.body;
-  const amtDrops = Number(amt)*1000000;
-  try{
-    const result = await sendRipple(dest, src_wallets[src], amtDrops);
-    res.send(result);
-  } catch(e) {
-    res.send(e);
-  }
-});
-
-app.get('/createwallet', (req,res) => {
-  res.send(createNewWallet());
-});
-
-app.post('/startstream', (req,res) => {
-  const {session_id, src_pub_key, rate} = req.body;
-  running_streams[src_pub_key] = startMoneyStream(dest_addresss[session_id], src_wallets[src_pub_key], rate);
-  res.send(src_pub_key);
-});
-
-app.post('/stopstream', (req,res) => {
-  stopMoneyStream(running_streams[src_pub_key]);
-});
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) => {
