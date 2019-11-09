@@ -6,6 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "build": "cd hack-kstate-2019/ && yarn build",
     "deploy": "gcloud app deploy",
     "test": "repo-tools test app -- server.js"
   },
