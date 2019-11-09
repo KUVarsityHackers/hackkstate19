@@ -44,7 +44,7 @@ const reserveWallet = () => {
   return newWallet.getAddress();
 }
 
-const convertAddress = (address) => (address.charAt(0) == 'r') ? Encode({account: address, testnet: TEST_NET}) : address
+const convertAddress = (address) => (addressValid(address) && address.charAt(0) == 'r') ? Encode({account: address, testnet: TEST_NET}) : address
 
 //returns available balance of a given address in XRP
 const getAvailableBalance = async (address) => {
@@ -68,11 +68,10 @@ const getAvailableBalance = async (address) => {
 
 //returns whether the given address is valid
 const addressValid = (address) => {
-  address = convertAddress(address);
   return Utils.isValidAddress(address);
 }
 
-//sends transfer_amount form wallet_from to address_to
+//sends transfer_amount form wallet_from to address_to in XRP
 const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   address_to = convertAddress(address_to);
   if(!addressValid(address_to) || !addressValid(wallet_from.getAddress())) {
@@ -83,7 +82,7 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   }
   
   const amount =  new XRPAmount();
-  amount.setDrops(transfer_amount);
+  amount.setDrops(String(transfer_amount*1000000));
 
   return await xpringClient.send(amount, address_to, wallet_from);  
 }
@@ -117,8 +116,8 @@ app.get("/session", (req, res) => {
 app.get('/balance/:address', async (req,res) => {
   const address = req.params.address;
   try{
-    const bal = Number(await getAvailableBalance(address));
-    res.send(String(bal));
+    const balance = Number(await getAvailableBalance(address));
+    res.send(String(balance));
   } catch(e) {
     res.send(e);
   }
@@ -129,19 +128,23 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const address = req.params.address;
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
-  const transactionDrops = pricePerHour * 1000000;
-  if(address !== mySession.instructor.address) {
-    try{
-      await sendRipple(mySession.instructor.address, src_wallets[address], transactionDrops);
-    } catch(e) {
-      const balDrops = await getAvailableBalance(address);
-      // Return the potential balance if the transaction would have been successful
-      res.send( Number(balDrops)/1000000 - transactionDrops);
-      res.send(e);
+  const pricePerSecond = Number(pricePerHour) / (60*60);
+  try{
+    const oldBalance = await getAvailableBalance(address);
+    if(address !== mySession.instructor.address) {
+      try {
+          await sendRipple(mySession.instructor.address, src_wallets[address], pricePerSecond);
+        }
+        catch(e) {
+          res.status(400).send(String(oldBalance - pricePerSecond));
+        }
     }
+    const balance = await getAvailableBalance(address);
+    res.status(200).send(balance);
   }
-  const balDrops = await getAvailableBalance(address);
-  res.send(balDrops/1000000);
+  catch(e) {
+    res.status(400).send(String(0 - pricePerSecond));
+  }
 });
 
 app.get('/wallet', (req,res) => {
