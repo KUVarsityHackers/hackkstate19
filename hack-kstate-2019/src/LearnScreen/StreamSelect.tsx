@@ -42,16 +42,25 @@ function StreamSelect (props: any) {
         <div
             key={i}
             style={{
-            height: 400,
-            background: 'url(https://placeimg.com/380/200/nature)'
+              height: 400,
+              backgroundColor: 'lightgray',
+              borderWidth: '2px',
+              borderColor: 'black',
+              boxShadow: '3,3,4',
+              borderRadius: '6px',
+              marginTop: '10px'
             }}
             onClick={() => props.selectStream(props.sessions[i].id)}
         >
-        {props.sessions[i].instructor.name}<br/>
-        {props.sessions[i].title}<br/>
-        {props.sessions[i].subject}<br/>
-        {props.sessions[i].price}<br/>
-
+        <br/>
+        <h2 style={{color:"gray"}}> {props.sessions[i].instructor.name} </h2>
+        <hr/>
+        <h1 style={{color:"black"}}>{props.sessions[i].title}</h1>
+        <hr/>
+        <h2 style={{color:"gray"}}>{props.sessions[i].subject}</h2>
+        <hr/>
+        <h3 style={{color:"black"}}>{props.sessions[i].price}</h3>
+        
         </div>
         )}
     </ItemsCarousel>
