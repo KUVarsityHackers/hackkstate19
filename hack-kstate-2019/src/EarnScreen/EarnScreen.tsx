@@ -4,10 +4,10 @@ import PageEnum from '../PageEnum';
 import useForm from "react-hook-form";
 import { ISession } from 'src/types';
 import { string } from 'prop-types';
+import { Helmet } from 'react-helmet';
 
-
+let sessionId:any;
 function EarnScreen (props: any) {
-    let sessionId
 
     const { register, handleSubmit } = useForm();
     const onSubmit =  async ( {name, publickey, title, subject, price}:any) => {
@@ -24,40 +24,63 @@ function EarnScreen (props: any) {
         const data = convertedValues;
 
         try {
-            const response = await fetch(url, {
+            sessionId =( await fetch(url, {
                 method: 'POST', // or 'PUT'
                 body: JSON.stringify(data), // data can be `string` or {object}!
                 headers: {
                 'Content-Type': 'application/json'
                 }
-            });
+            })).body;
         } catch (error) {
             console.error('Error:', error);
           }
     }
 
-    return (
-        <div className="Splash">
-            <header className="App-header">
-                <p>Earn</p>
-            </header>
-            <body>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <label>First name</label><br/>
-                    <input className="tutorForm" name="name" ref={register}></input><br/>
-                    <label>Title</label><br/>
-                    <input className="tutorForm" name="title" ref={register}></input><br/>
-                    <label>Subject</label><br/>
-                    <input className="tutorForm" name="subject" ref={register}></input><br/>
-                    <label>Price</label><br/>
-                    <input className="tutorForm" name="price" ref={register}></input><br/>
-                    <label>Public Key</label><br/>
-                    <input className="tutorForm" name="publickey" ref={register}></input><br/>
-                    <button type="submit">Submit</button>
-                </form>
-            </body>
-        </div>
-    );
+    if(sessionId) {
+        return (
+        <body>
+            <Helmet>
+            <script src="https://meet.jit.si/external_api.js"></script>
+                <script>
+                    const domain = "meet.jit.si";
+                    const api = new JitsiMeetExternalAPI(domain, {
+                                                                    "roomName": "1A123A52FG",
+                                                                    "width": 700,
+                                                                    "height": 700,
+                                                                    "parentNode": undefined,
+                                                                    "configOverwrite": {},
+                                                                    "interfaceConfigOverwrite": {
+                                                                        "filmStripOnly": false
+                                                                    }
+                                                                });
+                </script>
+            </Helmet>
+        </body>
+        );
+    } else {
+        return (
+            <div className="Splash">
+                <header className="App-header">
+                    <p>Earn</p>
+                </header>
+                <body>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <label>First name</label><br/>
+                        <input className="tutorForm" name="name" ref={register}></input><br/>
+                        <label>Title</label><br/>
+                        <input className="tutorForm" name="title" ref={register}></input><br/>
+                        <label>Subject</label><br/>
+                        <input className="tutorForm" name="subject" ref={register}></input><br/>
+                        <label>Price</label><br/>
+                        <input className="tutorForm" name="price" ref={register}></input><br/>
+                        <label>Public Key</label><br/>
+                        <input className="tutorForm" name="publickey" ref={register}></input><br/>
+                        <button type="submit">Submit</button>
+                    </form>
+                </body>
+            </div>
+        );
+    }
 }
 interface formSubmit {
     "name": string;

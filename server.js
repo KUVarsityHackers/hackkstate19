@@ -97,7 +97,13 @@ const stopMoneyStream = (moneyStream) => {
 }
 
 app.post("/session", (req, res) => {
-  const item = {name, subject, title, price} = req.body;
+  const {instructor, subject, title, price} = req.body;
+  const item = {
+    subject,
+    title,
+    price,
+    instructor
+  }
   sessions.push(item)
   res.json({code: "AWBSEW"});
 });
