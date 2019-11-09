@@ -60,7 +60,7 @@ const getAvailableBalance = async (address) => {
   catch (e) {
     console.log(e);
   }
-  
+
   const balXRP = Number(balDrops)/1000000;
   const availableBalance = balXRP - 20;
   return availableBalance;
@@ -116,7 +116,7 @@ app.get("/session", (req, res) => {
 app.get('/balance/:address', async (req,res) => {
   const address = req.params.address;
   try{
-    const balance = Number(await getAvailableBalance(address));
+    const balance = await getAvailableBalance(address);
     res.send(String(balance));
   } catch(e) {
     res.send(e);
@@ -131,7 +131,7 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const pricePerSecond = Number(pricePerHour) / (60*60);
   try{
     const oldBalance = await getAvailableBalance(address);
-    if(address !== mySession.instructor.address) {
+    if(address != mySession.instructor.address) {
       try {
           await sendRipple(mySession.instructor.address, src_wallets[address], pricePerSecond);
         }
@@ -139,8 +139,8 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
           res.status(400).send(String(oldBalance - pricePerSecond));
         }
     }
-    const balance = await getAvailableBalance(address);
-    res.status(200).send(balance);
+    const newBalance = await getAvailableBalance(address);
+    res.status(200).send(String(newBalance));
   }
   catch(e) {
     res.status(400).send(String(0 - pricePerSecond));
