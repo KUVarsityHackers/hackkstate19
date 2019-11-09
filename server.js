@@ -2,7 +2,7 @@
 // [START app]
 const express = require('express');
 const path = require('path');
-const body_parser = require('body-parser');
+const bodyParser = require('body-parser');
 const HashMap = require('hashmap')
 const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
 const uniqid = require('uniqid')
@@ -34,6 +34,8 @@ readInterface.on('line', function(line) {
 
 // parse JSON (application/json content-type)
 // app.use(body_parser.json());
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // returns a new wallet
 const reserveWallet = () => {
@@ -114,7 +116,7 @@ app.get("/session", (req, res) => {
 });
 
 app.get('/balance/:address', async (req,res) => {
-  let {address} = req.params;
+  const address = req.params.address;
   try{
     const bal = Number(await getAvailableBalance(address));
     res.send(String(bal));
@@ -124,7 +126,8 @@ app.get('/balance/:address', async (req,res) => {
 });
 
 app.get('/session/:sessionId/address/:address/', async (req,res) => {
-  const {sessionId, address} = req.params;
+  const sessionId = req.params.sessionId;
+  const address = req.params.address;
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
   const transactionDrops = pricePerHour * 1000000;
