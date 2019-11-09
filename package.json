@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "react-hook-form": "^3.27.0",
     "react-items-carousel": "^2.8.0",
+    "uniqid": "^5.1.0",
     "xpring-js": "^1.1.2",
     "yarn": "^1.19.1"
   },

@@ -5,6 +5,7 @@ import useForm from "react-hook-form";
 import { ISession } from 'src/types';
 import { string } from 'prop-types';
 import { Helmet } from 'react-helmet';
+import Stream from '../Stream'
 
 let sessionId:any;
 function EarnScreen (props: any) {
@@ -24,39 +25,25 @@ function EarnScreen (props: any) {
         const data = convertedValues;
 
         try {
-            sessionId =( await fetch(url, {
+            const request =( await fetch(url, {
                 method: 'POST', // or 'PUT'
                 body: JSON.stringify(data), // data can be `string` or {object}!
                 headers: {
                 'Content-Type': 'application/json'
                 }
-            })).body;
+            }));
+            const  response = await request.json();
+            sessionId = response.code;
+            console.log("\n\n\n\n\n\n\n\n\t");
+            console.log(sessionId);
+            console.log("\n\n\n\n\n\n\n\n");
         } catch (error) {
             console.error('Error:', error);
           }
     }
 
     if(sessionId) {
-        return (
-        <body>
-            <Helmet>
-            <script src="https://meet.jit.si/external_api.js"></script>
-                <script>
-                    const domain = "meet.jit.si";
-                    const api = new JitsiMeetExternalAPI(domain, {
-                                                                    "roomName": "1A123A52FG",
-                                                                    "width": 700,
-                                                                    "height": 700,
-                                                                    "parentNode": undefined,
-                                                                    "configOverwrite": {},
-                                                                    "interfaceConfigOverwrite": {
-                                                                        "filmStripOnly": false
-                                                                    }
-                                                                });
-                </script>
-            </Helmet>
-        </body>
-        );
+        return (<Stream session={sessionId}/>)
     } else {
         return (
             <div className="Splash">
