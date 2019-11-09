@@ -15,3 +15,8 @@
 
 # Node.js dependencies:
 node_modules/
+
+hack-kstate-2019/public/
+hack-kstate-2019/src/
+
+README.md

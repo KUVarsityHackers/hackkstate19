@@ -1,0 +1,2 @@
+const homePageButton = {width: "20%", height:"180px", borderRadius:"6px", backgroundColor:"#3C5081", borderRadiusColor:"black", fontSize:"27px", color:"white", margin:"7px"};
+export default homePageButton;

@@ -5,7 +5,9 @@
   "private": true,
   "main": "server.js",
   "scripts": {
+    "installAll": "yarn install && cd hack-kstate-2019/ && yarn install",
     "start": "node server.js",
+    "build": "cd hack-kstate-2019/ && yarn build",
     "deploy": "gcloud app deploy",
     "test": "repo-tools test app -- server.js"
   },
@@ -20,7 +22,11 @@
   "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.16.3",
-    "react-items-carousel": "^2.8.0"
+    "react-items-carousel": "^2.8.0",
+    "body-parser": "^1.19.0",
+    "react-hook-form": "^3.27.0",
+    "xpring-js": "^1.1.2",
+    "yarn": "^1.19.1"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "^3.3.0"
