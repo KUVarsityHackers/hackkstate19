@@ -1,30 +1,16 @@
-/**
- * Copyright 2018, Google, Inc.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import uniqid from "uniqid";
+import express from "express";
+import path from "path";
+import body_parser from "body-parser";
+import { Wallet, XRPAmount, XpringClient, Utils } from "xpring-js"
 
-'use strict';
 
 // [START app]
-const { Wallet, XRPAmount, XpringClient, Utils } = require("xpring-js");
+const app = express();
+
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
-const express = require('express');
-const path = require('path');
-const body_parser = require('body-parser');
-const sessions = [];
-const app = express();
 
 
 // parse JSON (application/json content-type)
@@ -82,6 +68,7 @@ stopMoneyStream(x);
 
 
 app.post("/session", (req, res) => {
+<<<<<<< Updated upstream
   const {instructor, subject, title, price} = req.body;
   const item = {
     subject,
@@ -89,6 +76,10 @@ app.post("/session", (req, res) => {
     price,
     instructor
   }
+=======
+  const item = {name, subject, title, price} = req.body;
+  const sessionID = uniqid();
+>>>>>>> Stashed changes
   sessions.push(item)
   res.json({code: "AWBSEW"});
 });
