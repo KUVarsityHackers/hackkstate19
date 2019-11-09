@@ -26,8 +26,8 @@ function LearnScreen () {
     const [sessions, setSessions] = useState([]);
 
     useEffect(() => {
-        fetch(`GetSessions`).then(res => res.json())
-                            .then(result => {setSessions(result.sessions)});
+        fetch(`/session`).then(res => res.json())
+                            .then(result => {setSessions(result)});
         fetch(`GenerateWallet`, {
             credentials: 'include'
         }).then(res => res.json())
