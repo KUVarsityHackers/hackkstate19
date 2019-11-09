@@ -47,3 +47,5 @@ export function useReducer(reducer: any, initialArg: any, init: any): any;
 export function useRef(initialValue: any): any;
 export function useState(initialState: any): any;
 export const version: string;
+
+declare module 'react-items-carousel';
