@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
-import PageEnum from '../PageEnum';
 import StreamSelect from './StreamSelect';
 import EmptyBalance from './EmptyBalance';
 import LearnStream from './LearnStream';
 
-function LearnScreen (props: any) {
+function LearnScreen () {
     const [streamId, setStreamId] = useState(0);
     const selectStream = (streamId: number) => {
         setStreamId(streamId);
@@ -17,11 +16,22 @@ function LearnScreen (props: any) {
     };
 
     let wallet = {"public_key": "no key set"};
+    let sessions = [];
+
+    useEffect(() => {
+        fetch(`GetSessions`)
+            .then(res => res.json())
+            .then(result => {sessions = result.sessions});
+        fetch(`GenerateWallet`)
+            .then(res => res.json())
+            .then(result => {wallet = result.wallet});
+    })
 
     if (!streamId){
         return (
             <div className="Splash">
-                <StreamSelect selectStream={selectStream}/>
+                <StreamSelect selectStream={selectStream}
+                              sessions={sessions}/>
             </div>
         );
     }
