@@ -38,19 +38,19 @@ function StreamSelect (props: any) {
         rightChevron={'>'}
         leftChevron={'<'}
     >
-        {Array.from(new Array(sessions.length)).map((_, i) =>
+        {Array.from(new Array(props.sessions.length)).map((_, i) =>
         <div
             key={i}
             style={{
             height: 400,
             background: 'url(https://placeimg.com/380/200/nature)'
             }}
-            onClick={() => props.selectStream(i).sessionId}
+            onClick={() => props.selectStream(props.sessions[i].id)}
         >
-        {sessions[i].instructor.name}<br/>
-        {sessions[i].title}<br/>
-        {sessions[i].subject}<br/>
-        {sessions[i].price}<br/>
+        {props.sessions[i].instructor.name}<br/>
+        {props.sessions[i].title}<br/>
+        {props.sessions[i].subject}<br/>
+        {props.sessions[i].price}<br/>
 
         </div>
         )}
