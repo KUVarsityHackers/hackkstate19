@@ -26,15 +26,21 @@ const body_parser = require('body-parser');
 
 const app = express();
 
-const testSession1 = {  "subject": "MATH",
-                        "name": "Colin",
-                        "topic": "Calc",
+const testSession1 = {  "subject": "Calc",
+                        "instructor": {
+                          "name": "Colin",
+                          "id": "234234"
+                        },
                         "title": "Colin's Crazy Confusing Calc Classroom",
                         "price": "5.0",
                       };
-const testSession2 = {  "subject": "Astronomy",
+const testSession2 = { 
+                      "instructor": {
+                        "name": "Colin",
+                        "id": "234234"
+                      },
+                      "subject": "Astronomy",
                       "name": "Andre",
-                      "topic": "Stars",
                       "title": "Andre's Awesome Astronomy Articulation",
                       "price": "75.0",
                     };
@@ -91,9 +97,9 @@ const stopMoneyStream = (moneyStream) => {
 }
 
 app.post("/session", (req, res) => {
-  const item = {name, subject, topic, title, price} = req.body;
+  const item = {name, subject, title, price} = req.body;
   sessions.push(item)
-  res.json(sessions);
+  res.json({code: "AWBSEW"});
 });
 
 app.get("/session", (req, res) => {
