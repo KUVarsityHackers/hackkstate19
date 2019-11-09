@@ -6,8 +6,10 @@ import { ISession } from 'src/types';
 import { string } from 'prop-types';
 import { Helmet } from 'react-helmet';
 import Stream from '../Stream'
+import EarnStream from './EarnStream';
 
 let sessionId:any;
+let addressId:any;
 function EarnScreen (props: any) {
 
     const { register, handleSubmit } = useForm();
@@ -35,13 +37,14 @@ function EarnScreen (props: any) {
             }));
             const  response = await request.json();
             sessionId = response;
+            addressId = publickey;
         } catch (error) {
             console.error('Error:', error);
           }
     }
 
     if(sessionId) {
-        return (<Stream session={sessionId}/>)
+        return (<EarnStream streamId={sessionId} address={addressId}/>)
     } else {
         return (
             <div className="Splash">
