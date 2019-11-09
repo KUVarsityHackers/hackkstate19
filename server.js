@@ -18,8 +18,6 @@ const src_wallets = [];
 const dest_address = [];
 const running_streams = [];
 
-
-
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
 
