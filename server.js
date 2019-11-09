@@ -35,7 +35,7 @@ readInterface.on('line', function(line) {
 // parse JSON (application/json content-type)
 // app.use(body_parser.json());
 
-// returns a new wallet WORKING
+// returns a new wallet
 const reserveWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   let newWallet = generationResult.wallet;
@@ -65,7 +65,7 @@ const getAvailableBalance = async (address) => {
   return availableBalance;
 }
 
-//returns whether the given address is valid WORKING
+//returns whether the given address is valid
 const addressValid = (address) => {
   address = convertAddress(address);
   return Utils.isValidAddress(address);
@@ -125,16 +125,21 @@ app.get('/balance/:address', async (req,res) => {
 
 app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const {sessionId, address} = req.params;
-  const mySession = sessions.get(sessionId)
+  const mySession = sessions.get(sessionId);
+  const pricePerHour = mySession.price;
+  const transactionDrops = pricePerHour * 1000000;
   if(address !== mySession.instructor.address) {
     try{
-      await sendRipple(mySession.instructor.address, src_wallets[address], amtDrops);
-      const balDrops = await getAvailableBalance(address);
-      res.send(balDrops/1000000);
+      await sendRipple(mySession.instructor.address, src_wallets[address], transactionDrops);
     } catch(e) {
+      const balDrops = await getAvailableBalance(address);
+      // Return the potential balance if the transaction would have been successful
+      res.send( Number(balDrops)/1000000 - transactionDrops);
       res.send(e);
     }
   }
+  const balDrops = await getAvailableBalance(address);
+  res.send(balDrops/1000000);
 });
 
 app.get('/wallet', (req,res) => {
