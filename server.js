@@ -7,6 +7,7 @@ const HashMap = require('hashmap')
 const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
 const uniqid = require('uniqid')
 const fs = require('fs');
+const readline = require('readline');
 
 const app = express();
 
@@ -65,20 +66,6 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   amount.setDrops(transfer_amount);
   return await xpringClient.send(amount, address_to, wallet_from);  
 }
-
-//starts the money stream from wallet_from to addr_to at rate per minute
-//Can throw
-// const startMoneyStream = (addr_to, wallet_from, rate) => {
-//   const tickerInterval = setInterval(() => {
-//     sendRipple(addr_to, wallet_from, rate);
-//   }, 60000);
-//   return tickerInterval;
-// }
-
-// //clears the ticker interval
-// const stopMoneyStream = (moneyStream) => {
-//   clearInterval(moneyStream);
-// }
 
 app.post("/session", (req, res) => {
   const {instructor, subject, title, price} = req.body;
