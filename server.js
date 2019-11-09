@@ -3,21 +3,32 @@
 const express = require('express');
 const path = require('path');
 const body_parser = require('body-parser');
-const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js')
-const uniqid = require('uniqid')
+const { Wallet, XRPAmount, XpringClient, Utils } = require('xpring-js');
+const uniqid = require('uniqid');
+const fs = require('fs');
+const readline = require('readline');
 
 const app = express();
 
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
+const unused_wallets = [];
+const used_wallets = [];
+
 const sessions = [];
 const instructors = {};
 
-const src_wallets = [];
 const dest_address = [];
-const running_streams = [];
 
+const readInterface = readline.createInterface({
+  input: fs.createReadStream('seeds.txt')
+});
+
+readInterface.on('line', function(line) {
+  const w = Wallet.generateWalletFromMnemonic(line);
+  unused_wallets.push(w);
+});
 
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
@@ -26,7 +37,7 @@ app.use(body_parser.json());
 const createNewWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   let newWallet = generationResult.wallet;
-  src_wallets[newWallet.getAddress()] = newWallet;
+  used_wallets[newWallet.getAddress()] = newWallet;
   return newWallet.getAddress();
 }
 
@@ -115,10 +126,9 @@ app.post('/pay', async (req,res) => {
   const {sessionID, src_addr} = req.body;
   const amtDrops = Number(dest_address[sessionID].price)*1000000;
   try{
-    const result = await sendRipple(dest_address[sessionID].instructor.publickey, src_wallets[src_addr], amtDrops);
-    const balance = await getBalance(src_addr);
-    const balXRP = balance/1000000;
-    res.send(balXRP);
+    const result = await sendRipple(dest_address[sessionID].instructor.publickey, used_wallets[src_addr], amtDrops);
+    const balance = Number(await getBalance(src_addr));
+    res.send(String(balXRP/1000000));
   } catch(e) {
     res.send(e);
   }
@@ -130,7 +140,7 @@ app.get('/wallet/reserve', (req,res) => {
 
 // app.post('/startstream', (req,res) => {
 //   const {session_id, src_pub_key} = req.body;;
-//   running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, src_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
+//   running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, used_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
 //   res.send(src_pub_key);
 // });
 
