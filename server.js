@@ -23,8 +23,23 @@ const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 const express = require('express');
 const path = require('path');
 const body_parser = require('body-parser');
-const sessions = []
+
 const app = express();
+
+const testSession1 = {  "subject": "MATH",
+                        "name": "Colin",
+                        "topic": "Calc",
+                        "title": "Colin's Crazy Confusing Calc Classroom",
+                        "price": "5.0",
+                      };
+const testSession2 = {  "subject": "Astronomy",
+                      "name": "Andre",
+                      "topic": "Stars",
+                      "title": "Andre's Awesome Astronomy Articulation",
+                      "price": "75.0",
+                    };
+
+const sessions = [testSession1, testSession2];
 
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
@@ -76,8 +91,8 @@ const stopMoneyStream = (moneyStream) => {
 }
 
 app.post("/session", (req, res) => {
-  const {name, subject, instructor} = req.body;
-  sessions.push({name, subject, instructor})
+  const item = {name, subject, topic, title, price} = req.body;
+  sessions.push(item)
   res.json(sessions);
 });
 
@@ -94,7 +109,7 @@ app.get('*', (req,res) =>{
 });
 
 // Listen to the App Engine-specified port, or 8080 otherwise
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
