@@ -59,17 +59,17 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
 
 //starts the money stream from wallet_from to addr_to at rate per minute
 //Can throw
-const startMoneyStream = (addr_to, wallet_from, rate) => {
-  const tickerInterval = setInterval(() => {
-    sendRipple(addr_to, wallet_from, rate);
-  }, 60000);
-  return tickerInterval;
-}
+// const startMoneyStream = (addr_to, wallet_from, rate) => {
+//   const tickerInterval = setInterval(() => {
+//     sendRipple(addr_to, wallet_from, rate);
+//   }, 60000);
+//   return tickerInterval;
+// }
 
-//clears the ticker interval
-const stopMoneyStream = (moneyStream) => {
-  clearInterval(moneyStream);
-}
+// //clears the ticker interval
+// const stopMoneyStream = (moneyStream) => {
+//   clearInterval(moneyStream);
+// }
 
 app.post("/session", (req, res) => {
 
@@ -100,7 +100,7 @@ app.get("/session", (req, res) => {
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
 
-app.post('/checkbalance', async (req,res) => {
+app.post('/balance', async (req,res) => {
   const {addr} = req.body;
   try{
     const x = Number(await getBalance(addr));
@@ -111,32 +111,34 @@ app.post('/checkbalance', async (req,res) => {
   }
 });
 
-app.post('/send', async (req,res) => {
-  const {dest, src, amt} = req.body;
-  const amtDrops = Number(amt)*1000000;
+app.post('/pay', async (req,res) => {
+  const {sessionID, src_addr} = req.body;
+  const amtDrops = Number(dest_address[sessionID].rate)*1000000;
   try{
-    const result = await sendRipple(dest, src_wallets[src], amtDrops);
-    res.send(result);
+    const result = await sendRipple(dest_address[sessionID].instructor.publickey, src_wallets[src_addr], amtDrops);
+    const balance = await getBalance(src_addr);
+    const balXRP = balance/1000000;
+    res.send({result, balXRP});
   } catch(e) {
     res.send(e);
   }
 });
 
-app.get('/createwallet', (req,res) => {
+app.get('/wallet/reserve', (req,res) => {
   res.send(createNewWallet());
 });
 
-app.post('/startstream', (req,res) => {
-  const {session_id, src_pub_key} = req.body;;
-  running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, src_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
-  res.send(src_pub_key);
-});
+// app.post('/startstream', (req,res) => {
+//   const {session_id, src_pub_key} = req.body;;
+//   running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, src_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
+//   res.send(src_pub_key);
+// });
 
-app.post('/stopstream', (req,res) => {
-  const {src_pub_key} = req.body;
-  stopMoneyStream(running_streams[src_pub_key]);
-  res.send(src_pub_key);
-});
+// app.post('/stopstream', (req,res) => {
+//   const {src_pub_key} = req.body;
+//   stopMoneyStream(running_streams[src_pub_key]);
+//   res.send(src_pub_key);
+// });
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) => {
