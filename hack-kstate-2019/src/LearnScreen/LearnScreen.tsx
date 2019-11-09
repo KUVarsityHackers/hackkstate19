@@ -11,20 +11,27 @@ function LearnScreen () {
     };
 
     const [balance, setBalance] = useState(0);
-    const updateBalance = (balance: number) => {
-        setBalance(balance);
+    const updateBalance = () => {
+        fetch(`CheckBalance`, {
+            method: 'POST',
+            body: JSON.stringify(wallet),
+            headers: {'Content-Type': 'application/json'},
+            credentials: 'include'
+        }).then(res => res.json())
+          .then(result => {setBalance(result.balance)})
     };
 
-    let wallet = {"public_key": "no key set"};
-    let sessions = [];
+    const [wallet, setWallet] = useState({"public_key": "no key set"});
+
+    const [sessions, setSessions] = useState([]);
 
     useEffect(() => {
-        fetch(`GetSessions`)
-            .then(res => res.json())
-            .then(result => {sessions = result.sessions});
-        fetch(`GenerateWallet`)
-            .then(res => res.json())
-            .then(result => {wallet = result.wallet});
+        fetch(`GetSessions`).then(res => res.json())
+                            .then(result => {setSessions(result.sessions)});
+        fetch(`GenerateWallet`, {
+            credentials: 'include'
+        }).then(res => res.json())
+          .then(result => {setWallet(result.wallet)});
     })
 
     if (!streamId){
