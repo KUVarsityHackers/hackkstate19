@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PageEnum from './PageEnum';
 import HomeScreen from './HomeScreen/HomeScreen';
-import LearnScreen from './LearnScreen/StreamSelect';
+import LearnScreen from './LearnScreen/LearnScreen';
 import EarnScreen from './EarnScreen/EarnScreen';
 
 function ContentArea() {
@@ -14,7 +14,7 @@ function ContentArea() {
         
         case PageEnum.LEARN:
             return(
-                <LearnScreen onPageChange={onPageChange}/>
+                <LearnScreen/>
             );
         case PageEnum.EARN:
             return(
