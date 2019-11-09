@@ -22,8 +22,12 @@ const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
 const express = require('express');
 const path = require('path');
-
+const body_parser = require('body-parser');
+const sessions = []
 const app = express();
+
+// parse JSON (application/json content-type)
+app.use(body_parser.json());
 
 //returns a new wallet
 const createNewWallet = () => {
@@ -33,7 +37,7 @@ const createNewWallet = () => {
 
 //returns balance of a given address
 //can throw
-const getBalance = (address) => {
+const getBalance = async (address) => {
   if(!addressValid(address)) {
     throw "Invalid address";
   }
@@ -47,7 +51,7 @@ const addressValid = (address) => {
 
 //sends transfer_amount form wallet_from to address_to
 //can throw
-const sendRipple = (address_to, wallet_from, transfer_amount) => {
+const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(!addressValid(address_to)) {
     throw "Invalid address to";
   }
@@ -71,6 +75,16 @@ const stopMoneyStream = (moneyStream) => {
   clearInterval(moneyStream);
 }
 
+app.post("/session", (req, res) => {
+  const {name, subject, instructor} = req.body;
+  sessions.push({name, subject, instructor})
+  res.json(sessions);
+});
+
+app.get("/session", (req, res) => {
+  res.json(sessions);
+});
+
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
 
@@ -80,7 +94,7 @@ app.get('*', (req,res) =>{
 });
 
 // Listen to the App Engine-specified port, or 8080 otherwise
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}...`);
 });
