@@ -25,17 +25,50 @@ const path = require('path');
 
 const app = express();
 
+//returns a new wallet
 const createNewWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   return generationResult.wallet;
 }
 
+//returns balance of a given address
+//can throw
 const getBalance = (address) => {
+  if(!addressValid(address)) {
+    throw "Invalid address";
+  }
   return await (xpringClient.getBalance(address)).getDrops();
 }
 
+//returns whether the given address is valid
 const addressValid = (address) => {
-  Utils.isAddressValid(address);
+  return Utils.isAddressValid(address);
+}
+
+//sends transfer_amount form wallet_from to address_to
+//can throw
+const sendRipple = (address_to, wallet_from, transfer_amount) => {
+  if(!addressValid(address_to)) {
+    throw "Invalid address to";
+  }
+
+  const amount = XRPAmount.new(transfer_amount);
+  amount.setDrops(transfer_amount);
+  return await xpringClient.send(amount, address_to, wallet_from);  
+}
+
+//starts the money stream from wallet_from to addr_to at rate per minute
+//Can throw
+const startMoneyStream = (addr_to, wallet_from, rate) => {
+  const tickerInterval = setInterval(() => {
+    sendRipple(addr_to, wallet_from, rate);
+  }, 60000);
+  return tickerInterval;
+}
+
+//clears the ticker interval
+const stopMoneyStream = (moneyStream) => {
+  clearInterval(moneyStream);
 }
 
 // Serve the static files from the React app
