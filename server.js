@@ -16,10 +16,27 @@
 'use strict';
 
 // [START app]
+const { Wallet, XRPAmount, XpringClient, Utils } = require("xpring-js");
+const remoteURL = "grpc.xpring.tech:80";
+const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
+
 const express = require('express');
 const path = require('path');
 
 const app = express();
+
+const createNewWallet = () => {
+  const generationResult = Wallet.generateRandomWallet();
+  return generationResult.wallet;
+}
+
+const getBalance = (address) => {
+  return await (xpringClient.getBalance(address)).getDrops();
+}
+
+const addressValid = (address) => {
+  Utils.isAddressValid(address);
+}
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
