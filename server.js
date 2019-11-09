@@ -22,8 +22,33 @@ const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
 const express = require('express');
 const path = require('path');
+const body_parser = require('body-parser');
 
 const app = express();
+
+const testSession1 = {  "subject": "Calc",
+                        "instructor": {
+                          "name": "Colin",
+                          "id": "234234"
+                        },
+                        "title": "Colin's Crazy Confusing Calc Classroom",
+                        "price": "5.0",
+                      };
+const testSession2 = { 
+                      "instructor": {
+                        "name": "Colin",
+                        "id": "234234"
+                      },
+                      "subject": "Astronomy",
+                      "name": "Andre",
+                      "title": "Andre's Awesome Astronomy Articulation",
+                      "price": "75.0",
+                    };
+
+const sessions = [testSession1, testSession2];
+
+// parse JSON (application/json content-type)
+app.use(body_parser.json());
 
 //returns a new wallet
 const createNewWallet = () => {
@@ -33,7 +58,7 @@ const createNewWallet = () => {
 
 //returns balance of a given address
 //can throw
-const getBalance = (address) => {
+const getBalance = async (address) => {
   if(!addressValid(address)) {
     throw "Invalid address";
   }
@@ -47,7 +72,7 @@ const addressValid = (address) => {
 
 //sends transfer_amount form wallet_from to address_to
 //can throw
-const sendRipple = (address_to, wallet_from, transfer_amount) => {
+const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(!addressValid(address_to)) {
     throw "Invalid address to";
   }
@@ -70,6 +95,16 @@ const startMoneyStream = (addr_to, wallet_from, rate) => {
 const stopMoneyStream = (moneyStream) => {
   clearInterval(moneyStream);
 }
+
+app.post("/session", (req, res) => {
+  const item = {name, subject, title, price} = req.body;
+  sessions.push(item)
+  res.json({code: "AWBSEW"});
+});
+
+app.get("/session", (req, res) => {
+  res.json(sessions);
+});
 
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
