@@ -113,12 +113,12 @@ app.post('/balance', async (req,res) => {
 
 app.post('/pay', async (req,res) => {
   const {sessionID, src_addr} = req.body;
-  const amtDrops = Number(dest_address[sessionID].rate)*1000000;
+  const amtDrops = Number(dest_address[sessionID].price)*1000000;
   try{
     const result = await sendRipple(dest_address[sessionID].instructor.publickey, src_wallets[src_addr], amtDrops);
     const balance = await getBalance(src_addr);
     const balXRP = balance/1000000;
-    res.send({result, balXRP});
+    res.send(balXRP);
   } catch(e) {
     res.send(e);
   }
