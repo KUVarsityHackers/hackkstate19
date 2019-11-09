@@ -23,58 +23,39 @@ const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 const express = require('express');
 const path = require('path');
 const body_parser = require('body-parser');
-
+const sessions = [];
 const app = express();
 
-const testSession1 = {  "subject": "Calc",
-                        "instructor": {
-                          "name": "Colin",
-                          "id": "234234"
-                        },
-                        "title": "Colin's Crazy Confusing Calc Classroom",
-                        "price": "5.0",
-                      };
-const testSession2 = { 
-                      "instructor": {
-                        "name": "Colin",
-                        "id": "234234"
-                      },
-                      "subject": "Astronomy",
-                      "name": "Andre",
-                      "title": "Andre's Awesome Astronomy Articulation",
-                      "price": "75.0",
-                    };
-
-const sessions = [testSession1, testSession2];
 
 // parse JSON (application/json content-type)
 app.use(body_parser.json());
 
-//returns a new wallet
+//returns a new wallet WORKING
 const createNewWallet = () => {
   const generationResult = Wallet.generateRandomWallet();
   return generationResult.wallet;
 }
 
-//returns balance of a given address
-//can throw
+//returns balance of a given address WORKING
+//can throw, returns a bigint
 const getBalance = async (address) => {
   if(!addressValid(address)) {
-    throw "Invalid address";
+    return "Invalid address";
   }
-  return await (xpringClient.getBalance(address)).getDrops();
+
+  return await xpringClient.getBalance(address);
 }
 
-//returns whether the given address is valid
+//returns whether the given address is valid WORKING
 const addressValid = (address) => {
-  return Utils.isAddressValid(address);
+  return Utils.isValidAddress(address);
 }
 
 //sends transfer_amount form wallet_from to address_to
 //can throw
 const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(!addressValid(address_to)) {
-    throw "Invalid address to";
+    return "Invalid address to";
   }
 
   const amount = XRPAmount.new(transfer_amount);
@@ -86,7 +67,7 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
 //Can throw
 const startMoneyStream = (addr_to, wallet_from, rate) => {
   const tickerInterval = setInterval(() => {
-    sendRipple(addr_to, wallet_from, rate);
+    //sendRipple(addr_to, wallet_from, rate);
   }, 60000);
   return tickerInterval;
 }
@@ -95,6 +76,10 @@ const startMoneyStream = (addr_to, wallet_from, rate) => {
 const stopMoneyStream = (moneyStream) => {
   clearInterval(moneyStream);
 }
+
+let x = startMoneyStream("","","");
+stopMoneyStream(x);
+
 
 app.post("/session", (req, res) => {
   const item = {name, subject, title, price} = req.body;
@@ -109,8 +94,21 @@ app.get("/session", (req, res) => {
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'hack-kstate-2019/build')));
 
+app.get('/checkbal', async (req,res) => {
+  let x = Number(await getBalance("XV4drF7fLvCsixD8iy3RoeSNLzeFThLoaEZ5CBL1B2nAnfy"));
+  console.log(x);
+  let y = String(x/1000000);
+  res.send(y);
+});
+
+app.get('/send', async (req,res) => {
+  //sendRipple("XV4drF7fLvCsixD8iy3RoeSNLzeFThLoaEZ5CBL1B2nAnfy", w, 100);
+  x = startMoneyStream("","","");
+  res.send("H");
+});
+
 // Handles any requests that don't match the ones above
-app.get('*', (req,res) =>{
+app.get('*', (req,res) => {
   res.sendFile(path.join(__dirname+'/hack-kstate-2019/build/index.html'));
 });
 
