@@ -88,6 +88,7 @@ app.post("/session", (req, res) => {
     instructors[instructor.publickey] = {name: instructor.name, sessionID}
   }
   sessions.push(item);
+  dest_address[sessionID] = item;
 
   res.json(sessionID);
 });
@@ -126,13 +127,15 @@ app.get('/createwallet', (req,res) => {
 });
 
 app.post('/startstream', (req,res) => {
-  const {session_id, src_pub_key, rate} = req.body;
-  running_streams[src_pub_key] = startMoneyStream(dest_addresss[session_id], src_wallets[src_pub_key], rate);
+  const {session_id, src_pub_key} = req.body;;
+  running_streams[src_pub_key] = startMoneyStream(dest_address[session_id].instructor.publickey, src_wallets[src_pub_key], Number(dest_address[session_id].price)*1000000);
   res.send(src_pub_key);
 });
 
 app.post('/stopstream', (req,res) => {
+  const {src_pub_key} = req.body;
   stopMoneyStream(running_streams[src_pub_key]);
+  res.send(src_pub_key);
 });
 
 // Handles any requests that don't match the ones above
