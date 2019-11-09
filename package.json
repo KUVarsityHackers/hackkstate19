@@ -5,6 +5,7 @@
   "private": true,
   "main": "server.js",
   "scripts": {
+    "installAll": "yarn install && cd hack-kstate-2019/ && yarn install",
     "start": "node server.js",
     "build": "cd hack-kstate-2019/ && yarn build",
     "deploy": "gcloud app deploy",
