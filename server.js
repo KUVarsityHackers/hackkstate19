@@ -39,8 +39,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // returns a new wallet
 const reserveWallet = () => {
-  const generationResult = Wallet.generateRandomWallet();
-  let newWallet = generationResult.wallet;
+  let newWallet = unused_wallets.shift();
   used_wallets[newWallet.getAddress()] = newWallet;
   return newWallet.getAddress();
 }
