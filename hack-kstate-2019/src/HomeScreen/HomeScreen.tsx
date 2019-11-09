@@ -6,16 +6,10 @@ import homePageButton from '../Style/buttonStyle';
 function HomeScreen (props: any) {
     return (
         <div className="Splash">
-
-            <div className="App-header">
-
-                <p>Name</p>
-            </div>
             <div className="App-Body">
                 <button style={homePageButton} onClick={() => props.onPageChange(PageEnum.LEARN)}> Learn </button>
                 <button style={homePageButton} onClick={() => props.onPageChange(PageEnum.EARN)}> Earn </button>               
             </div>
-
         </div>
     );
 }
