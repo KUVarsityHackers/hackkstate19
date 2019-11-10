@@ -1,4 +1,4 @@
-const options = {
+var options = {
     "roomName": document.currentScript.getAttribute('arg'),
     "width": "80%",
     "height": "80%", 
@@ -8,5 +8,5 @@ const options = {
     "filmStripOnly": false
     }
 };
-const domain = "meet.jit.si";
-const api = new JitsiMeetExternalAPI(domain, options);
+var domain = "meet.jit.si";
+var api = new JitsiMeetExternalAPI(domain, options);
