@@ -121,7 +121,6 @@ app.post("/session", (req, res) => {
   if(!instructors.has(address)) {
     instructors.set(address, {address, name});
   }
-
   sessions.set(id, session);
   res.json(id);
 });
@@ -186,26 +185,39 @@ app.get('/session/:sessionId/address/:address', async (req,res) => {
     res.status(200).send(String(-1));
     return
   }
-  const mySession = sessions.get(sessionId);
-  const pricePerHour = mySession.price;
-  const secondsPerRequest = 5;
-  const pricePerSecond = Number(pricePerHour*secondsPerRequest) / (60*60);
-  try{
-    const oldBalance = await getAvailableBalance(address);
-    if(address != mySession.instructor.address) {
-      try {
-          await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
-        }
-        catch(e) {
-          res.status(200).send(String(oldBalance - pricePerSecond));
-          return;
-        }
+
+  if(sessions.has(sessionId)) {
+    const mySession = sessions.get(sessionId);
+    const pricePerHour = mySession.price;
+    const secondsPerRequest = 5;
+    const pricePerSecond = Number(pricePerHour*secondsPerRequest) / (60*60);
+    try{
+      const oldBalance = await getAvailableBalance(address);
+      if(address != mySession.instructor.address) {
+        try {
+            if(used_wallets[address])
+            await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
+          }
+          catch(e) {
+            res.status(200).send(String(oldBalance - pricePerSecond));
+            return;
+          }
+      }
+      const newBalance = await getAvailableBalance(address);
+      res.status(200).send(String(newBalance));
     }
-    const newBalance = await getAvailableBalance(address);
-    res.status(200).send(String(newBalance));
+    catch(e) {
+      res.status(200).send(String(0 - pricePerSecond));
+    }
   }
-  catch(e) {
-    res.status(200).send(String(0 - pricePerSecond));
+  else {
+    try {
+      const balance = await getAvailableBalance(address);
+      res.status(200).send(String(balance));
+    }
+    catch(e) {
+      res.status(200).send(String(0));
+    }
   }
 });
 
