@@ -9,6 +9,7 @@ const uniqid = require('uniqid')
 const fs = require('fs');
 const readline = require('readline');
 const {Encode, Decode} = require('xrpl-tagged-address-codec')
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const app = express();
 
@@ -121,6 +122,10 @@ app.get('/balance/:address', async (req,res) => {
   } catch(e) {
     res.status(400).send(String(e));
   }
+});
+
+app.delete('/address/:address', async (req,res) => {
+
 });
 
 app.get('/session/:sessionId/address/:address/', async (req,res) => {

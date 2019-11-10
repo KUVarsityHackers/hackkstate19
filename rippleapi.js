@@ -1,12 +1,12 @@
 'use strict';
-const RippleAPI = require('ripple-lib').RippleAPI;
+
 
 const api = new RippleAPI({
   server: 'wss://s.altnet.rippletest.net'
 });
 api.connect().then(() => {
   /* begin custom code ------------------------------------ */
-  const myAddress = 'rnNKVZkXJQVifajxGBuwzFD6mvNSdmzUxD';
+  const myAddress = 'rpVDn4PcYXgUL4wsXvJLBX3RuzkSCeHyjJ';
 
   console.log('getting account info for', myAddress);
   return api.getAccountInfo(myAddress);
