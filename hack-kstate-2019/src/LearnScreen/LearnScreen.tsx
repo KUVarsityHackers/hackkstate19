@@ -12,27 +12,27 @@ function LearnScreen () {
 
     const [balance, setBalance] = useState(0);
     const updateBalance = () => {
-        fetch(`CheckBalance`, {
-            method: 'POST',
-            body: JSON.stringify(wallet),
-            headers: {'Content-Type': 'application/json'},
+        fetch(`/balance/` + address, {
             credentials: 'include'
         }).then(res => res.json())
-          .then(result => {setBalance(result.balance)})
+          .then(result => {setBalance(result)})
     };
+    const onBalanceChange = (result: number) => {
+        setBalance(result)
+    }
 
-    const [wallet, setWallet] = useState({"public_key": "no key set"});
+    const [address, setAddress] = useState("");
 
     const [sessions, setSessions] = useState([]);
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
                             .then(result => {setSessions(result)});
-        fetch(`GenerateWallet`, {
+        fetch(`/wallet`, {
             credentials: 'include'
-        }).then(res => res.json())
-          .then(result => {setWallet(result.wallet)});
-    })
+        }).then(res => res.text())
+          .then(result => {setAddress(result); updateBalance()});
+    }, [])
 
     if (streamId < 0){
         return (
@@ -42,18 +42,20 @@ function LearnScreen () {
             </div>
         );
     }
-    else if (!balance) {
+    else if (balance < 0) {
         return (
             <div className="Splash">
                 <EmptyBalance updateBalance={updateBalance}
-                              wallet={wallet}/>
+                              address={address}/>
             </div>
         );
     }
     else {
         return (
             <div className="Splash">
-                <LearnStream streamId={streamId}/>
+                <LearnStream  updateBalance={onBalanceChange}
+                              streamId={streamId}
+                              address={address}/>
             </div>
         );
     }
