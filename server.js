@@ -39,6 +39,14 @@ readInterface.on('line', function(line) {
   unused_wallets.push(w);
 });
 
+const schedule = require('node-schedule');
+schedule.scheduleJob('0 0 * * *', () => { console.log("Withdrawing all wallets")
+      used_wallets.forEach((w) => {
+        deleteWallet(w);
+        console.log(w.getPublicKey());
+        unused_wallets.push(w); });
+      })
+
 // parse JSON (application/json content-type)
 // app.use(body_parser.json());
 app.use(bodyParser.json()); // support json encoded bodies
@@ -47,12 +55,12 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // returns a new wallet
 const reserveWallet = () => {
   const newWallet = unused_wallets.shift();
-  const rAddress = Decode(newWallet.getAddress()).account;
+  const rAddress = Decode(Wallet.getAddress()).account;
   used_wallets[rAddress] = newWallet;
   return rAddress;
 }
 
-const convertAddress = (address) => (addressValid(address) && address.charAt(0) == 'r') ? Encode({account: address, testnet: TEST_NET}) : address
+const convertAddress = (address) => (addressValid(address) && address.charAt(0) == 'r') ? Encode({account: address}) : address
 
 //returns available balance of a given address in XRP
 const getAvailableBalance = async (address) => {
@@ -141,19 +149,29 @@ app.get('/balance/:address', async (req,res) => {
 
 const deleteWallet = async (wallet) => {
   try {
+    console.log("Delete wallet called")
     const address = convertAddress(wallet.getAddress());
     const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
+    console.log("Ripple api amde")
     await api.connect();
+    console.log("ripple api connection made")
+    console.log("Address", address)
     const accountInfo = await api.getAccountInfo(address);
+    console.log("have account info")
     const txsInfo = await api.getTransactions(address, {limit:accountInfo.sequence});
     const lsSenders = txsInfo.map((entry) => {if(convertAddress(entry.specification.source.address) != convertAddress(address)) return entry;}, []).filter(function( element ) {
       return element !== undefined;})
     if(lsSenders.length > 0) {
+      console.log("senders list non-zero")
       const lastTransactionSender = lsSenders[0].specification.source.address;
       const balance = await getAvailableBalance(address);
+      console.log("Balance", balance)
       const xSender = convertAddress(lastTransactionSender);
+      console.log("Xsender", xSender)
       if(balance > .2) {
+        console.log("Before send ripple")
         const result = await sendRipple(xSender, wallet, balance - .1);  
+        console.log("after send ripple")
         await api.disconnect();
         return result;
       }
@@ -166,22 +184,33 @@ const deleteWallet = async (wallet) => {
 }
 
 app.delete('/address/:address', async (req,res) => {
-  const wallet = used_wallets[req.params.address];
-  if(wallet) {
-    try{
-      await deleteWallet(wallet);
-      unused_wallets.push(wallet);
-      used_wallets[req.params.address] = undefined;
-    }
-    catch(e) {}
+  console.log("Delete", req.params.address);
+  let wallet = used_wallets[req.params.address];
+  if(!wallet) {
+    const u_wallet = unused_wallets.find((w) => {return Decode(w.getAddress()).account == req.params.address } )
+    wallet = u_wallet;
   }
+  if(!wallet) {
+    console.log("No Wallet Found")
+    res.send("No Wallet found for Address");
+    return
+  }
+  try{
+    console.log("Deleting", wallet)
+    await deleteWallet(wallet);
+    console.log("Done Deleting")
+    unused_wallets.push(wallet);
+    used_wallets[req.params.address] = undefined;
+    console.log("successful delete")
+  }
+  catch(e) {}
   res.send("OK");
 });
 
 app.get('/session/:sessionId/address/:address', async (req,res) => {
   const sessionId = req.params.sessionId;
   const address = req.params.address;
-  if(sessionId == "invalid" || address == "invalid") {
+  if(address == "invalid") {
     res.status(200).send(String(-1));
     return
   }
