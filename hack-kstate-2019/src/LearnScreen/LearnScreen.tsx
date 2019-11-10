@@ -10,7 +10,7 @@ function LearnScreen () {
         setStreamId(streamId);
     };
 
-    const [balance, setBalance] = useState(0);
+    const [balance, setBalance] = useState(-1);
     const updateBalance = () => {
         fetch(`/balance/` + address, {
             credentials: 'include'
@@ -29,12 +29,13 @@ function LearnScreen () {
         fetch(`/session`).then(res => res.json())
                             .then(result => {
                                 setSessions(result);
-                                fetch(`/wallet`, {
-                                    credentials: 'include'
-                                }).then(res => res.text())
-                                  .then(result => {setAddress(result); updateBalance()});
                             });
-        
+        fetch(`/wallet`, {
+            credentials: 'include'
+        }).then(res => res.text())
+            .then(result => {
+                setAddress(result); 
+            });
     }, [])
 
     if (streamId < 0){

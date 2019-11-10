@@ -2,16 +2,24 @@ import React, { useEffect } from 'react';
 import '../App.css';
 import Stream from 'src/Stream';
 
+let sessionInterval:any;
 function LearnStream (props: any) {
     useEffect(() => {
-        setInterval(sessionUpdate, 5000)
+        sessionInterval = setInterval(sessionUpdate, 5000)
     }, [])
 
     const sessionUpdate = () => {
         fetch(`/session/` + props.streamId + `/address/` + props.address, {
             credentials: 'include'
         }).then(res => res.text())
-          .then(result => {console.log(result); props.updateBalance(result)})
+          .then(result => {
+            if(parseFloat(result) < 0) {
+                clearInterval(sessionInterval)
+                api.dispose();
+            }
+            console.log(result); 
+            props.updateBalance(parseFloat(result))
+        })
     };
 
     return(
