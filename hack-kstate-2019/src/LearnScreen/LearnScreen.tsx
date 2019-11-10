@@ -11,12 +11,6 @@ function LearnScreen () {
     };
 
     const [balance, setBalance] = useState(-1);
-    const updateBalance = () => {
-        fetch(`/balance/` + address, {
-            credentials: 'include'
-        }).then(res => res.json())
-          .then(result => {setBalance(result)})
-    };
     const onBalanceChange = (result: number) => {
         setBalance(result)
     }

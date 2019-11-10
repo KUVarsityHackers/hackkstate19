@@ -12,7 +12,7 @@ function EmptyBalance (props: any) {
             credentials: 'include'
         }).then(res => res.text())
           .then(result => {
-            if(parseFloat(result) < 0) {
+            if(parseFloat(result) >= 0) {
                 clearInterval(emptyInterval)
             }
             props.updateBalance(parseFloat(result))
