@@ -46,18 +46,18 @@ function EarnScreen (props: any) {
         return (<EarnStream streamId={sessionId} address={addressId}/>)
     } else {
         return (
-            <div className="Splash">
+            <div id="Form">
                 <body>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <label>First name</label><br/>
+                        <label className="formNames">First name</label><br/>
                         <input className="tutorForm" name="name" ref={register}></input><br/>
-                        <label>Title</label><br/>
+                        <label className="formNames">Title</label><br/>
                         <input className="tutorForm" name="title" ref={register}></input><br/>
-                        <label>Subject</label><br/>
+                        <label className="formNames">Subject</label><br/>
                         <input className="tutorForm" name="subject" ref={register}></input><br/>
-                        <label>Price</label><br/>
+                        <label className="formNames">Price</label><br/>
                         <input className="tutorForm" name="price" ref={register}></input><br/>
-                        <label>Address</label><br/>
+                        <label className="formNames">Address</label><br/>
                         <input className="tutorForm" name="address" ref={register}></input><br/>
                         <button type="submit">Submit</button>
                     </form>
