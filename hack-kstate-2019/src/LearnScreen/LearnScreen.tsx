@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../App.css';
 import StreamSelect from './StreamSelect';
 import EmptyBalance from './EmptyBalance';
@@ -7,19 +7,25 @@ import { ISession } from 'src/types';
 
 function LearnScreen () {
     const [streamId, setStreamId] = useState("invalid");
+    const streamIdRef = useRef(streamId);
+    streamIdRef.current = streamId;   
     const [session, setSession] = useState({});
     const selectStream = (stream: ISession) => {
         setSession(stream);
         setStreamId(stream.id ? stream.id : "invalid");
+        useCallback ( () => {
+            setStreamId(stream.id ? stream.id : "invalid") }, [stream.id]);
     };
 
     const [balance, setBalance] = useState(-1);
     const [address, setAddress] = useState("invalid");
+    const addressRef = useRef(address);
+    addressRef.current = address;
 
     const [sessions, setSessions] = useState([]);
 
     const sessionUpdate = () => {
-        fetch(`/session/` + streamId + `/address/` + address, {
+        fetch(`/session/` + streamId.current + `/address/` + addressRef.current, {
             credentials: 'include'
         }).then(res => res.text())
           .then(result => {
@@ -33,8 +39,8 @@ function LearnScreen () {
                                 setSessions(result);
                                 fetch(`/wallet`)
                                 .then(res => res.text())
-                                .then(result => {
-                                        setAddress(result); 
+                                .then(result => { useCallback ( () => {
+                                        setAddress(result) }, [result]);
                                     });
                             });
 
