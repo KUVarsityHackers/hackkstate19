@@ -178,14 +178,15 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
           await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
         }
         catch(e) {
-          res.status(400).send(String(oldBalance - pricePerSecond));
+          res.status(200).send(String(oldBalance - pricePerSecond));
+          return;
         }
     }
     const newBalance = await getAvailableBalance(address);
     res.status(200).send(String(newBalance));
   }
   catch(e) {
-    res.status(400).send(String(0 - pricePerSecond));
+    res.status(200).send(String(0 - pricePerSecond));
   }
 });
 
