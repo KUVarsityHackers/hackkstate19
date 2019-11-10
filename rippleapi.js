@@ -6,16 +6,21 @@ const api = new RippleAPI({
 });
 api.connect().then(() => {
   /* begin custom code ------------------------------------ */
-  const myAddress = 'rpVDn4PcYXgUL4wsXvJLBX3RuzkSCeHyjJ';
+  const myAddress = 'rnNKVZkXJQVifajxGBuwzFD6mvNSdmzUxD';
 
   console.log('getting account info for', myAddress);
-  return api.getAccountObjects(myAddress);
+  return api.getAccountInfo(myAddress);
 
 }).then(info => {
-  console.log(info);
-  console.log('getAccountInfo done');
+  return api.getTransaction(info.previousAffectingTransactionID);
+
 
   /* end custom code -------------------------------------- */
+}).then(info => {
+    console.log(info.specification.source.address);
+    console.log('getAccountInfo done');
+  
+    /* end custom code -------------------------------------- */
 }).then(() => {
   return api.disconnect();
 }).then(() => {
