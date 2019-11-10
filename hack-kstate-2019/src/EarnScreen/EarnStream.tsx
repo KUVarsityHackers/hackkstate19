@@ -23,13 +23,13 @@ function EarnStream (props: any) {
         .then(resp => resp.text())
         .then((balance) => {
             setBalance(parseFloat(balance) - origBalance);
-        });
+        }); 
 
         }
 
     return(
         
-        <div>
+        <div className="stream">
             <p>{balance}</p>
             <Stream session={props.streamId}/>
         </div>
