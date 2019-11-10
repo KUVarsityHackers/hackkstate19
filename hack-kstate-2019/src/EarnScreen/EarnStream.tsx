@@ -10,7 +10,7 @@ function EarnStream (props: any) {
     useEffect(() => {
             const url = `/balance/${props.address}`;
             fetch(url,{method: 'GET'}).then(resp => resp.text()).then((balance) => {
-            origBalance = parseInt(balance);
+            origBalance = parseFloat(balance);
         })
         setInterval(useBalance, 2000);
       }, [])
@@ -22,7 +22,7 @@ function EarnStream (props: any) {
         fetch(url,{method: 'GET'})
         .then(resp => resp.text())
         .then((balance) => {
-            setBalance(parseInt(balance) - origBalance);
+            setBalance(parseFloat(balance) - origBalance);
         });
 
         }
