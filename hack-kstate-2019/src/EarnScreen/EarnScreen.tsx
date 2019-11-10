@@ -65,7 +65,9 @@ function EarnScreen (props: any) {
     const toggleQr = () => updateQrRead(!qrRead); 
 
     if(sessionId) {
-        return (<EarnStream streamId={sessionId} address={addressId}/>)
+        return (<EarnStream onPageChange={props.onPageChange}
+                            streamId={sessionId} 
+                            address={addressId}/>)
     } else {
         return (
             <div id="Form">

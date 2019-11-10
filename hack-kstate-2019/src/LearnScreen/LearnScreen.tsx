@@ -3,14 +3,17 @@ import '../App.css';
 import StreamSelect from './StreamSelect';
 import EmptyBalance from './EmptyBalance';
 import LearnStream from './LearnStream';
+import { ISession } from 'src/types';
 
 function LearnScreen () {
-    const [streamId, setStreamId] = useState(-1);
-    const selectStream = (streamId: number) => {
-        setStreamId(streamId);
+    const [streamId, setStreamId] = useState("");
+    const [session, setSession] = useState({});
+    const selectStream = (stream: ISession) => {
+        setSession(stream);
+        setStreamId(stream.id ? stream.id : "");
     };
 
-    const [balance, setBalance] = useState(0);
+    const [balance, setBalance] = useState(-1);
     const updateBalance = () => {
         fetch(`/balance/` + address, {
             credentials: 'include'
@@ -37,7 +40,7 @@ function LearnScreen () {
         
     }, [])
 
-    if (streamId < 0){
+    if (!streamId){
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
@@ -57,7 +60,9 @@ function LearnScreen () {
         return (
             <div className="Splash">
                 <LearnStream  updateBalance={onBalanceChange}
+                              selectStream={selectStream}
                               streamId={streamId}
+                              session={session}
                               address={address}/>
             </div>
         );

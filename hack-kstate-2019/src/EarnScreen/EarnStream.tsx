@@ -1,7 +1,9 @@
 import React, { useCallback } from 'react';
 import '../App.css';
+import '../Stream.css';
 import Stream from 'src/Stream';
 import {useState, useEffect} from 'react';
+import PageEnum from 'src/PageEnum';
 
 let origBalance = 0;
 function EarnStream (props: any) {
@@ -28,10 +30,20 @@ function EarnStream (props: any) {
         }
 
     return(
-        
-        <div className="stream">
-            <p>{balance}</p>
-            <Stream session={props.streamId}/>
+        <div className="streamContainer">
+            <div className="leftPanel">
+                <button className="backButton" 
+                        onClick={() => props.onPageChange(PageEnum.HOME)}>
+                        <h3>Leave Stream</h3>
+                </button>
+            </div>
+            <div className="stream">
+                <Stream session={props.streamId}/>
+            </div>
+            <div className="rightPanel">
+                <h2>Session Net Gain:</h2>
+                <h2>{balance}</h2>
+            </div>
         </div>
     );
 }

@@ -50,7 +50,7 @@ function StreamSelect (props: any) {
               borderRadius: '6px',
               marginTop: '10px'
             }}
-            onClick={() => props.selectStream(props.sessions[i].id)}
+            onClick={() => props.selectStream(props.sessions[i])}
         >
         <br/>
         <h2 style={{color:"gray"}}> {props.sessions[i].instructor.name} </h2>

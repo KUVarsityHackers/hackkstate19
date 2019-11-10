@@ -1,0 +1,29 @@
+.streamContainer {
+    height: 100%;
+    width: 100%;
+    display: flex;
+  }
+  .leftPanel {
+    width: 18%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 5%;
+  }
+  .stream {
+    width: 64%;
+  }
+  .rightPanel {
+    width: 18%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 5%;
+  }
+  .backButton {
+    background-color: rgb(224, 82, 82);
+    border-radius: 12px;
+    color: black;
+    border-color: black;
+    padding: 10%;
+  }
