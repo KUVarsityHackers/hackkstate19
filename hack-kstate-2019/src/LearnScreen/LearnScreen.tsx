@@ -5,17 +5,13 @@ import EmptyBalance from './EmptyBalance';
 import LearnStream from './LearnStream';
 
 function LearnScreen () {
-    const [streamId, setStreamId] = useState(-1);
-    const selectStream = (streamId: number) => {
+    const [streamId, setStreamId] = useState("invalid");
+    const selectStream = (streamId: string) => {
         setStreamId(streamId);
     };
 
     const [balance, setBalance] = useState(-1);
-    const onBalanceChange = (result: number) => {
-        setBalance(result)
-    }
-
-    const [address, setAddress] = useState("-1");
+    const [address, setAddress] = useState("invalid");
 
     const [sessions, setSessions] = useState([]);
 
@@ -41,7 +37,7 @@ function LearnScreen () {
 
     }, [])
 
-    if (streamId < 0) {
+    if (streamId == "invalid") {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
