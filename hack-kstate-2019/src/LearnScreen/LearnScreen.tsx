@@ -27,11 +27,14 @@ function LearnScreen () {
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
-                            .then(result => {setSessions(result)});
-        fetch(`/wallet`, {
-            credentials: 'include'
-        }).then(res => res.text())
-          .then(result => {setAddress(result); updateBalance()});
+                            .then(result => {
+                                setSessions(result);
+                                fetch(`/wallet`, {
+                                    credentials: 'include'
+                                }).then(res => res.text())
+                                  .then(result => {setAddress(result); updateBalance()});
+                            });
+        
     }, [])
 
     if (streamId < 0){
