@@ -153,7 +153,7 @@ const deleteWallet = async (wallet) => {
       const lastTransactionSender = lsSenders[0].specification.source.address;
       const balance = await getAvailableBalance(address);
       const xSender = convertAddress(lastTransactionSender);
-      if(balance > .11) {
+      if(balance > .2) {
         const result = await sendRipple(xSender, wallet, balance - .1);  
         await api.disconnect();
         return result;
