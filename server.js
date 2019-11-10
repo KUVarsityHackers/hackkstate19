@@ -150,6 +150,8 @@ app.delete('/address/:address', async (req,res) => {
       console.log(used_wallets[req.params.address]);
       const result = await sendRipple(xSender, used_wallets[req.params.address], balance - .06);
       console.log(result);
+      unused_wallets.push(used_wallets[req.params.address]);
+      used_wallets[req.params.address] = undefined;
       api.disconnect();
       res.send(result);
     }
