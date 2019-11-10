@@ -6,7 +6,9 @@ function App() {
   return (
     <div className="App">
       <div className="App-header">
+      <a href=".">
       <img src="logo-white.png" height="70px"/>
+      </a>
       </div>
       <ContentArea/>
     </div>
