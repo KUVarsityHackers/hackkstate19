@@ -1,2 +1,0 @@
-const homePageButton = {width: "20%", height:"180px", borderRadius:"6px", borderRadiusColor:"black" ,backgroundColor:"#a9a9a9", borderRadiusColor:"black", fontSize:"35px", color:"white", margin:"7px"};
-export default homePageButton;
