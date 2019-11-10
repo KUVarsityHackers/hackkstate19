@@ -13,6 +13,7 @@ let sessionId:any;
 let addressId:any;
 function EarnScreen (props: any) {
     const [ code, updateCode ] = useState("");
+    const [ qrRead, updateQrRead ] = useState(false);
     const { register, handleSubmit } = useForm();
     const onSubmit =  async ( {name, address, title, subject, price}:any) => {
         const convertedValues: ISession = { instructor: {
@@ -59,10 +60,10 @@ function EarnScreen (props: any) {
         console.error(err)
     };
 
-    const handeleCodeChange = (val) => {
-        console.log(val.target.value);
-        updateCode(val.target.value);
-    }
+    const handeleCodeChange = (val) => updateCode(val.target.value);
+
+    const toggleQr = () => updateQrRead(!qrRead); 
+
     if(sessionId) {
         return (<EarnStream streamId={sessionId} address={addressId}/>)
     } else {
@@ -78,15 +79,20 @@ function EarnScreen (props: any) {
                         <input className="tutorForm" placeholder="Address" name="address" onChange={(val) => handeleCodeChange(val)} value={code} ref={register}></input><br/>
                         <button type="submit" id="submit">Submit</button>
                     </form>
+                    <button id="toggleQr" onClick={()=>toggleQr()}>Toggle QR Reader</button>
                 </body>
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                <QrReader
-                    delay={300}
-                    onError={handleError}
-                    onScan={handleScan}
-                    style={{ width: '70%' }}
-                />
-                </div>
+
+                {qrRead ? 
+                    (<div style={{display: 'flex', justifyContent: 'center'}}>
+                    <QrReader
+                        delay={300}
+                        onError={handleError}
+                        onScan={handleScan}
+                        style={{ width: '70%' }}
+                    />
+                    </div>)
+                    :
+                    <div></div>}
             </div>
         );
     }

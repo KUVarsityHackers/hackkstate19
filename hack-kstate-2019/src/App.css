@@ -85,6 +85,16 @@
   border-color: black;
 }
 
+#toggleQr {
+  width:30%;
+  height:30px;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 20px;
+  float: right;
+  border-color: black;
+}
+
 .stream {
   margin: 0 auto;
   
