@@ -55,9 +55,8 @@ const getAvailableBalance = async (address) => {
   if(!addressValid(address)) {
     return "Invalid address";
   }
-  let balDrops;
   try {
-    balDrops = await xpringClient.getBalance(address);
+    const balDrops = await xpringClient.getBalance(address);
     const balXRP = Number(balDrops)/1000000;
     const availableBalance = balXRP - 20;
     return availableBalance;
@@ -209,5 +208,4 @@ app.listen(PORT, () => {
 });
 
 // [END app]
-
 module.exports = app;
