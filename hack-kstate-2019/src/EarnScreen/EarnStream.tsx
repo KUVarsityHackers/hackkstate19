@@ -9,20 +9,20 @@ function EarnStream (props: any) {
     
     useEffect(() => {
             const url = `/balance/${props.address}`;
-            fetch(url,{method: 'GET'}).then(resp => resp.json()).then((balance) => {
-            console.log(balance)
-            origBalance = balance;
+            fetch(url,{method: 'GET'}).then(resp => resp.text()).then((balance) => {
+            origBalance = parseInt(balance);
         })
         setInterval(useBalance, 2000);
       }, [])
 
 
     const useBalance =  async () => {
-        const url = `/sessionId/${props.streamId}/address/${props.address}`;
+        const url = `/session/${props.streamId}/address/${props.address}`;
 
-        fetch(url,{method: 'GET'}).then(resp => resp.json()).then((balance) => {
-            console.log(balance, origBalance)
-            setBalance(balance - origBalance);
+        fetch(url,{method: 'GET'})
+        .then(resp => resp.text())
+        .then((balance) => {
+            setBalance(parseInt(balance) - origBalance);
         });
 
         }
