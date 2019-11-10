@@ -14,7 +14,7 @@ function LearnScreen () {
         setSession(stream);
         setStreamId(stream.id ? stream.id : "invalid") };
 
-    const [balance, setBalance] = useState(-1);
+    const [balance, setBalance] = useState(0);
     const [address, setAddress] = useState("invalid");
     const addressRef = useRef(address);
     addressRef.current = address;
@@ -60,6 +60,8 @@ function LearnScreen () {
         return (
             <div className="Splash">
                 <LearnStream  selectStream={selectStream}
+                              setSessions={setSessions}
+                              setBalance={setBalance}
                               streamId={streamId}
                               session={session}
                               address={address}/>

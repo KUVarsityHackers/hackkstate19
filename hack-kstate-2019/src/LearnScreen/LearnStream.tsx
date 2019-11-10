@@ -7,7 +7,9 @@ function LearnStream (props: any) {
         <div className="streamContainer">
             <div className="leftPanel">
                 <button className="backButton" 
-                        onClick={() => props.selectStream(-1)}>
+                        onClick={() => {props.selectStream(-1); props.setBalance(0); api.dispose();
+                            fetch(`/session`).then(res => res.json())
+                            .then(result => props.setSessions(result)); }   }>
                         <h3>Leave Stream</h3>
                 </button>
             </div>
