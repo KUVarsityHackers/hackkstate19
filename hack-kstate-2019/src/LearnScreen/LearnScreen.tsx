@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../App.css';
 import StreamSelect from './StreamSelect';
 import EmptyBalance from './EmptyBalance';
@@ -7,19 +7,22 @@ import { ISession } from 'src/types';
 
 function LearnScreen () {
     const [streamId, setStreamId] = useState("invalid");
+    const streamIdRef = useRef(streamId);
+    streamIdRef.current = streamId;   
     const [session, setSession] = useState({});
     const selectStream = (stream: ISession) => {
         setSession(stream);
-        setStreamId(stream.id ? stream.id : "invalid");
-    };
+        setStreamId(stream.id ? stream.id : "invalid") };
 
-    const [balance, setBalance] = useState(-1);
+    const [balance, setBalance] = useState(0);
     const [address, setAddress] = useState("invalid");
+    const addressRef = useRef(address);
+    addressRef.current = address;
 
     const [sessions, setSessions] = useState([]);
 
     const sessionUpdate = () => {
-        fetch(`/session/` + streamId + `/address/` + address, {
+        fetch(`/session/` + streamIdRef.current + `/address/` + addressRef.current, {
             credentials: 'include'
         }).then(res => res.text())
           .then(result => {
@@ -29,20 +32,15 @@ function LearnScreen () {
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
-                            .then(result => {
-                                setSessions(result);
-                                fetch(`/wallet`)
+                         .then(result => setSessions(result))
+                         .then( () => { fetch(`/wallet`)
                                 .then(res => res.text())
-                                .then(result => {
-                                        setAddress(result); 
-                                    });
-                            });
-
+                                .then(result => setAddress(result)
+                            )});
         setInterval(sessionUpdate, 5000);
+    }, []);
 
-    }, [])
-
-    if (streamId == "invalid") {
+    if (streamIdRef.current == "invalid") {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
@@ -62,6 +60,8 @@ function LearnScreen () {
         return (
             <div className="Splash">
                 <LearnStream  selectStream={selectStream}
+                              setSessions={setSessions}
+                              setBalance={setBalance}
                               streamId={streamId}
                               session={session}
                               address={address}/>
