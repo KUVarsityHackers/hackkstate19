@@ -77,7 +77,7 @@ function EarnScreen (props: any) {
                         <input className="tutorForm" placeholder="Name" name="name" ref={register}></input><br/>
                         <input className="tutorForm" placeholder="Title" name="title" ref={register}></input><br/>
                         <input className="tutorForm" placeholder="Subject" name="subject" ref={register}></input><br/>
-                        <input className="tutorForm" placeholder="Price" name="price" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Price ((XRP / Hour) per User" name="price" ref={register}></input><br/>
                         <input className="tutorForm" placeholder="XRP Wallet Address" name="address" onChange={(val) => handeleCodeChange(val)} value={code} ref={register}></input><br/>
                         <button type="submit" id="submit">Submit</button>
                     </form>
