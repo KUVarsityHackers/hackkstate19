@@ -15,6 +15,7 @@ const app = express();
 
 const nocache = require('nocache');
 app.use(nocache());
+app.set('etag', false)
 
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
