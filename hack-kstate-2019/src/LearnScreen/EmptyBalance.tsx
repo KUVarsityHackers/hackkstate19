@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react';
 import '../App.css';
 
+let emptyInterval:any;
 function EmptyBalance (props: any) {
-    useEffect(() => {
-        setInterval(props.updateBalance, 1000)
-    }, [])
-
     let url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ripple:" + props.address;
 
     return(

@@ -55,9 +55,8 @@ const getAvailableBalance = async (address) => {
   if(!addressValid(address)) {
     return "Invalid address";
   }
-  let balDrops;
   try {
-    balDrops = await xpringClient.getBalance(address);
+    const balDrops = await xpringClient.getBalance(address);
     const balXRP = Number(balDrops)/1000000;
     const availableBalance = balXRP - 20;
     return availableBalance;
@@ -155,6 +154,8 @@ app.delete('/address/:address', async (req,res) => {
       console.log(used_wallets[req.params.address]);
       const result = await sendRipple(xSender, used_wallets[req.params.address], balance - .06);
       console.log(result);
+      unused_wallets.push(used_wallets[req.params.address]);
+      used_wallets[req.params.address] = undefined;
       api.disconnect();
       res.send(result);
     }
@@ -163,9 +164,13 @@ app.delete('/address/:address', async (req,res) => {
   }
 });
 
-app.get('/session/:sessionId/address/:address/', async (req,res) => {
+app.get('/session/:sessionId/address/:address', async (req,res) => {
   const sessionId = req.params.sessionId;
   const address = req.params.address;
+  if(sessionId == "invalid" || address == "invalid") {
+    res.status(200).send(String(-1));
+    return
+  }
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
   const secondsPerRequest = 5;
@@ -177,14 +182,15 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
           await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
         }
         catch(e) {
-          res.status(400).send(String(oldBalance - pricePerSecond));
+          res.status(200).send(String(oldBalance - pricePerSecond));
+          return;
         }
     }
     const newBalance = await getAvailableBalance(address);
     res.status(200).send(String(newBalance));
   }
   catch(e) {
-    res.status(400).send(String(0 - pricePerSecond));
+    res.status(200).send(String(0 - pricePerSecond));
   }
 });
 
@@ -207,5 +213,4 @@ app.listen(PORT, () => {
 });
 
 // [END app]
-
 module.exports = app;

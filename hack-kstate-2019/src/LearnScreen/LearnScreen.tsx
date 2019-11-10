@@ -6,41 +6,41 @@ import LearnStream from './LearnStream';
 import { ISession } from 'src/types';
 
 function LearnScreen () {
-    const [streamId, setStreamId] = useState("");
+    const [streamId, setStreamId] = useState("invalid");
     const [session, setSession] = useState({});
     const selectStream = (stream: ISession) => {
         setSession(stream);
-        setStreamId(stream.id ? stream.id : "");
+        setStreamId(stream.id ? stream.id : "invalid");
     };
 
     const [balance, setBalance] = useState(-1);
-    const updateBalance = () => {
-        fetch(`/balance/` + address, {
-            credentials: 'include'
-        }).then(res => res.json())
-          .then(result => {setBalance(result)})
-    };
-    const onBalanceChange = (result: number) => {
-        setBalance(result)
-    }
-
-    const [address, setAddress] = useState("");
+    const [address, setAddress] = useState("invalid");
 
     const [sessions, setSessions] = useState([]);
+
+    const sessionUpdate = () => {
+        fetch(`/session/` + streamId + `/address/` + address, {
+            credentials: 'include'
+        }).then(res => res.text())
+          .then(result => {
+            setBalance(parseFloat(result))
+        })
+    };
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
                             .then(result => {
                                 setSessions(result);
-                                fetch(`/wallet`, {
-                                    credentials: 'include'
-                                }).then(res => res.text())
-                                  .then(result => {setAddress(result); updateBalance()});
                             });
-        
+        fetch(`/wallet`).then(res => res.text())
+            .then(result => {
+                setAddress(result); 
+            });
+        setInterval(sessionUpdate, 5000);
+
     }, [])
 
-    if (!streamId){
+    if (streamId == "invalid") {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
@@ -49,18 +49,17 @@ function LearnScreen () {
         );
     }
     else if (balance < 0) {
+        
         return (
             <div className="Splash">
-                <EmptyBalance updateBalance={updateBalance}
-                              address={address}/>
+                <EmptyBalance address={address}/>
             </div>
         );
     }
     else {
         return (
             <div className="Splash">
-                <LearnStream  updateBalance={onBalanceChange}
-                              selectStream={selectStream}
+                <LearnStream  selectStream={selectStream}
                               streamId={streamId}
                               session={session}
                               address={address}/>
