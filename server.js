@@ -167,7 +167,10 @@ app.delete('/address/:address', async (req,res) => {
 app.get('/session/:sessionId/address/:address', async (req,res) => {
   const sessionId = req.params.sessionId;
   const address = req.params.address;
-  if(sessionId == "-1" || address == "-1")
+  if(sessionId == "invalid" || address == "invalid") {
+    res.status(200).send(String(-1));
+    return
+  }
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
   const secondsPerRequest = 5;
