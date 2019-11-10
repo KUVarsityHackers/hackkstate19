@@ -40,7 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 // returns a new wallet
 const reserveWallet = () => {
   const newWallet = unused_wallets.shift();
-  const rAddress = Decode(newWallet.getAddress());
+  const rAddress = Decode(newWallet.getAddress()).account;
   used_wallets[rAddress] = newWallet;
   return rAddress;
 }
