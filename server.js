@@ -82,11 +82,13 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(getAvailableBalance(wallet_from.getAddress()) < transfer_amount) {
     throw "Insufficient funds";
   }
-  
-  const amount =  new XRPAmount();
-  amount.setDrops(String(transfer_amount*1000000));
-
-  return await xpringClient.send(amount, address_to, wallet_from);  
+  const amount =  Math.floor(transfer_amount * 1000000);
+  try {
+    const response = await xpringClient.send(amount, address_to, wallet_from); 
+    return response;
+  } catch (err) {
+    throw "Pay Error"
+  }
 }
 
 app.post("/session", (req, res) => {
@@ -127,20 +129,17 @@ app.get('/balance/:address', async (req,res) => {
 
 app.delete('/address/:address', async (req,res) => {
   const address = req.params.address;
-
   const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
 
   try {
     await api.connect();
-    console.log('getting account info for', address);
     const accountInfo = await api.getAccountInfo(address);
     const transactionInfo = await api.getTransaction(accountInfo.previousAffectingTransactionID);
     const lastTransactionSender = transactionInfo.specification.source.address;
-    const result = await sendRipple(lastTransactionSender, src_wallets[address], (await getAvailableBalance(address)) - 19.9996);
+    const result = await sendRipple(lastTransactionSender, used_wallets[address], (await getAvailableBalance(address)) - 19.9996);
     api.disconnect();
     res.send(result);
   } catch(e) {
-    console.log("Error: ", e);
     res.status(400).send(String(e));
   }
 });
@@ -150,12 +149,13 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
   const address = req.params.address;
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
-  const pricePerSecond = Number(pricePerHour) / (60*60);
+  const secondsPerRequest = 5;
+  const pricePerSecond = Number(pricePerHour*secondsPerRequest) / (60*60);
   try{
     const oldBalance = await getAvailableBalance(address);
     if(address != mySession.instructor.address) {
       try {
-          await sendRipple(mySession.instructor.address, src_wallets[address], pricePerSecond);
+          await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
         }
         catch(e) {
           res.status(400).send(String(oldBalance - pricePerSecond));
