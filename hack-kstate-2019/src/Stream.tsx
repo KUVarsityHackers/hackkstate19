@@ -22,15 +22,10 @@ const useScript = url => {
 
 
 return (
-    <body>
-        <div>
-
-            <div id="scriptId">
-                {useScript("https://meet.jit.si/external_api.js")}
-                {useScript("/JitsiScript.js")}
-            </div>
-        </div>
-    </body>
+      <div id="scriptId">
+          {useScript("https://meet.jit.si/external_api.js")}
+          {useScript("/JitsiScript.js")}
+      </div>
     );
 }
 

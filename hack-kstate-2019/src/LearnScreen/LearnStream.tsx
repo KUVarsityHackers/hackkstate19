@@ -4,7 +4,7 @@ import Stream from 'src/Stream';
 
 function LearnStream (props: any) {
     return(
-        <div>
+        <div className="stream">
             <Stream session={props.streamId}/>
         </div>
     );
