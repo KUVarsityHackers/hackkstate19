@@ -12,10 +12,7 @@ function LearnScreen () {
     const [session, setSession] = useState({});
     const selectStream = (stream: ISession) => {
         setSession(stream);
-        setStreamId(stream.id ? stream.id : "invalid");
-        useCallback ( () => {
-            setStreamId(stream.id ? stream.id : "invalid") }, [stream.id]);
-    };
+        setStreamId(stream.id ? stream.id : "invalid") };
 
     const [balance, setBalance] = useState(-1);
     const [address, setAddress] = useState("invalid");
@@ -25,7 +22,7 @@ function LearnScreen () {
     const [sessions, setSessions] = useState([]);
 
     const sessionUpdate = () => {
-        fetch(`/session/` + streamId.current + `/address/` + addressRef.current, {
+        fetch(`/session/` + streamIdRef.current + `/address/` + addressRef.current, {
             credentials: 'include'
         }).then(res => res.text())
           .then(result => {
@@ -35,20 +32,15 @@ function LearnScreen () {
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
-                            .then(result => {
-                                setSessions(result);
-                                fetch(`/wallet`)
+                         .then(result => setSessions(result))
+                         .then( () => { fetch(`/wallet`)
                                 .then(res => res.text())
-                                .then(result => { useCallback ( () => {
-                                        setAddress(result) }, [result]);
-                                    });
-                            });
-
+                                .then(result => setAddress(result)
+                            )});
         setInterval(sessionUpdate, 5000);
+    }, []);
 
-    }, [])
-
-    if (streamId == "invalid") {
+    if (streamIdRef.current == "invalid") {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
