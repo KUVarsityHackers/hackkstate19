@@ -15,24 +15,33 @@ function LearnScreen () {
         setBalance(result)
     }
 
-    const [address, setAddress] = useState("");
+    const [address, setAddress] = useState("-1");
 
     const [sessions, setSessions] = useState([]);
+
+    const sessionUpdate = () => {
+        fetch(`/session/` + streamId + `/address/` + address, {
+            credentials: 'include'
+        }).then(res => res.text())
+          .then(result => {
+            setBalance(parseFloat(result))
+        })
+    };
 
     useEffect(() => {
         fetch(`/session`).then(res => res.json())
                             .then(result => {
                                 setSessions(result);
                             });
-        fetch(`/wallet`, {
-            credentials: 'include'
-        }).then(res => res.text())
+        fetch(`/wallet`).then(res => res.text())
             .then(result => {
                 setAddress(result); 
             });
+        setInterval(sessionUpdate, 5000);
+
     }, [])
 
-    if (streamId < 0){
+    if (streamId < 0) {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
@@ -41,20 +50,17 @@ function LearnScreen () {
         );
     }
     else if (balance < 0) {
+        
         return (
             <div className="Splash">
-                <EmptyBalance  updateBalance={onBalanceChange}
-                              streamId={streamId}
-                              address={address}/>
+                <EmptyBalance  />
             </div>
         );
     }
     else {
         return (
             <div className="Splash">
-                <LearnStream  updateBalance={onBalanceChange}
-                              streamId={streamId}
-                              address={address}/>
+                <LearnStream />
             </div>
         );
     }
