@@ -7,16 +7,17 @@ import { string } from 'prop-types';
 import Stream from '../Stream'
 import EarnStream from './EarnStream';
 import QrReader from 'react-qr-reader'
+import { useState, useEffect } from 'react';
 
 let sessionId:any;
 let addressId:any;
 function EarnScreen (props: any) {
-
+    const [ code, updateCode ] = useState("");
     const { register, handleSubmit } = useForm();
     const onSubmit =  async ( {name, address, title, subject, price}:any) => {
         const convertedValues: ISession = { instructor: {
                                                         name,
-                                                        address
+                                                        address: code
                                                     },
                                             title,
                                             subject,
@@ -58,40 +59,30 @@ function EarnScreen (props: any) {
     //       console.error(err)
     //     };
 
-    class Test extends Component {
-        state = {
-          result: 'No result'
-        }
-      
-        handleScan = data => {
-          if (data) {
-            this.setState({
-              result: data
-            })
-          }
-        }
-        handleError = err => {
-          console.error(err)
-        }
-    }
-    
-    let QR = new Test('No result');
 
+    let state = {
+        result: ''
+    }
+      
+    const handleScan = (data) => {
+        if (data !== null) {
+            updateCode(data.slice(7));
+        }
+    };
+
+    const handleError = (err) => {
+        console.error(err)
+    };
+
+    const handeleCodeChange = (val) => {
+        console.log(val.target.value);
+        updateCode(val.target.value);
+    }
     if(sessionId) {
         return (<EarnStream streamId={sessionId} address={addressId}/>)
     } else {
         return (
-            <div id="Form">
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                <QrReader
-                    delay={300}
-                    onError={QR.handleError}
-                    onScan={QR.handleScan}
-                    style={{ width: '50%' }}
-                />
-                </div>
-              <p>Scan QR Code For Wallet Address</p>
-                
+            <div id="Form">                
                 <body>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <label className="formNames">First name</label><br/>
@@ -103,10 +94,19 @@ function EarnScreen (props: any) {
                         <label className="formNames">Price</label><br/>
                         <input className="tutorForm" name="price" ref={register}></input><br/>
                         <label className="formNames">Address</label><br/>
-                        <input className="tutorForm" name="address" ref={register}></input><br/>
+                        <input className="tutorForm" name="address" onChange={(val) => handeleCodeChange(val)} value={code} ref={register}></input><br/>
                         <button type="submit">Submit</button>
                     </form>
                 </body>
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                <QrReader
+                    delay={300}
+                    onError={handleError}
+                    onScan={handleScan}
+                    style={{ width: '70%' }}
+                />
+                </div>
+              <p>Scan Wallet Address QR </p>
             </div>
         );
     }
