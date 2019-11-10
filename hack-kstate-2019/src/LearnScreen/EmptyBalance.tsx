@@ -1,10 +1,23 @@
 import React, { useEffect } from 'react';
 import '../App.css';
 
+let emptyInterval:any;
 function EmptyBalance (props: any) {
     useEffect(() => {
-        setInterval(props.updateBalance, 1000)
+        emptyInterval = setInterval(sessionUpdate, 5000)
     }, [])
+
+    const sessionUpdate = () => {
+        fetch(`/session/` + props.streamId + `/address/` + props.address, {
+            credentials: 'include'
+        }).then(res => res.text())
+          .then(result => {
+            if(parseFloat(result) < 0) {
+                clearInterval(emptyInterval)
+            }
+            props.updateBalance(parseFloat(result))
+        })
+    };
 
     let url = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=ripple:" + props.address;
 

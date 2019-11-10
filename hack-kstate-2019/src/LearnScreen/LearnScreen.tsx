@@ -49,7 +49,8 @@ function LearnScreen () {
     else if (balance < 0) {
         return (
             <div className="Splash">
-                <EmptyBalance updateBalance={updateBalance}
+                <EmptyBalance  updateBalance={onBalanceChange}
+                              streamId={streamId}
                               address={address}/>
             </div>
         );
