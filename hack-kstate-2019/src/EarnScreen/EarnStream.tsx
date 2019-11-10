@@ -14,7 +14,7 @@ function EarnStream (props: any) {
             fetch(url,{method: 'GET'}).then(resp => resp.text()).then((balance) => {
             origBalance = parseFloat(balance);
         })
-        setInterval(useBalance, 2000);
+        setInterval(useBalance, 1000);
       }, [])
 
 
