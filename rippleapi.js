@@ -1,17 +1,18 @@
 'use strict';
-
+const RippleAPI = require('ripple-lib').RippleAPI;
 
 const api = new RippleAPI({
   server: 'wss://s.altnet.rippletest.net'
 });
 api.connect().then(() => {
   /* begin custom code ------------------------------------ */
-  const myAddress = 'rpVDn4PcYXgUL4wsXvJLBX3RuzkSCeHyjJ';
+  const myAddress = 'rnNKVZkXJQVifajxGBuwzFD6mvNSdmzUxD';
 
   console.log('getting account info for', myAddress);
   return api.getAccountInfo(myAddress);
 
 }).then(info => {
+  console.log(info);
   return api.getTransaction(info.previousAffectingTransactionID);
 
 
