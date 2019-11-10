@@ -164,9 +164,10 @@ app.delete('/address/:address', async (req,res) => {
   }
 });
 
-app.get('/session/:sessionId/address/:address/', async (req,res) => {
+app.get('/session/:sessionId/address/:address', async (req,res) => {
   const sessionId = req.params.sessionId;
   const address = req.params.address;
+  if(sessionId == "-1" || address == "-1")
   const mySession = sessions.get(sessionId);
   const pricePerHour = mySession.price;
   const secondsPerRequest = 5;
