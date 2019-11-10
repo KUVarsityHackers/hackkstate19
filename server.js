@@ -119,7 +119,7 @@ app.get('/balance/:address', async (req,res) => {
     const balance = await getAvailableBalance(address);
     res.send(String(balance));
   } catch(e) {
-    res.send(e);
+    res.status(400).send(String(e));
   }
 });
 
