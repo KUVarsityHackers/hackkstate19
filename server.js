@@ -35,6 +35,7 @@ const readInterface = readline.createInterface({
 readInterface.on('line', function(line) {
   const w = Wallet.generateWalletFromMnemonic(line);
   deleteWallet(w);
+  console.log(w.getPublicKey());
   unused_wallets.push(w);
 });
 
@@ -152,17 +153,17 @@ const deleteWallet = async (wallet) => {
       const lastTransactionSender = lsSenders[0].specification.source.address;
       const balance = await getAvailableBalance(address);
       const xSender = convertAddress(lastTransactionSender);
-      if(balance > .1) {
+      if(balance > .11) {
         const result = await sendRipple(xSender, wallet, balance - .1);  
         await api.disconnect();
         return result;
       }
       await api.disconnect();
-      return null;
     }
   } catch(e) {
     throw (String (e))
   }
+  return null;
 }
 
 app.delete('/address/:address', async (req,res) => {
