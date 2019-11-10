@@ -47,19 +47,15 @@ function EarnScreen (props: any) {
     } else {
         return (
             <div id="Form">
+                <p id ="tutorTitle">Session Information</p>
                 <body>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <label className="formNames">First name</label><br/>
-                        <input className="tutorForm" name="name" ref={register}></input><br/>
-                        <label className="formNames">Title</label><br/>
-                        <input className="tutorForm" name="title" ref={register}></input><br/>
-                        <label className="formNames">Subject</label><br/>
-                        <input className="tutorForm" name="subject" ref={register}></input><br/>
-                        <label className="formNames">Price</label><br/>
-                        <input className="tutorForm" name="price" ref={register}></input><br/>
-                        <label className="formNames">Address</label><br/>
-                        <input className="tutorForm" name="address" ref={register}></input><br/>
-                        <button type="submit">Submit</button>
+                        <input className="tutorForm" placeholder="Name" name="name" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Title" name="title" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Subject" name="subject" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Price" name="price" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Address" name="address" ref={register}></input><br/>
+                        <button type="submit" id="submit">Submit</button>
                     </form>
                 </body>
             </div>

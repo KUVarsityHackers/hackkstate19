@@ -76,6 +76,9 @@ const addressValid = (address) => {
 //sends transfer_amount form wallet_from to address_to in XRP
 const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   address_to = convertAddress(address_to);
+  if(address_to == wallet_from.getAddress()) {
+    throw "Cannot send to self";
+  }
   if(!addressValid(address_to) || !addressValid(wallet_from.getAddress())) {
     throw "Invalid address";
   }
@@ -128,17 +131,28 @@ app.get('/balance/:address', async (req,res) => {
 });
 
 app.delete('/address/:address', async (req,res) => {
-  const address = req.params.address;
+  const address = convertAddress(req.params.address);
   const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
 
   try {
     await api.connect();
     const accountInfo = await api.getAccountInfo(address);
-    const transactionInfo = await api.getTransaction(accountInfo.previousAffectingTransactionID);
-    const lastTransactionSender = transactionInfo.specification.source.address;
-    const result = await sendRipple(lastTransactionSender, used_wallets[address], (await getAvailableBalance(address)) - 19.9996);
-    api.disconnect();
-    res.send(result);
+    const txsInfo = await api.getTransactions(address, {limit:accountInfo.sequence});
+    const lsSenders = txsInfo.map((entry) => {if(convertAddress(entry.specification.source.address) != convertAddress(address)) return entry;}, []).filter(function( element ) {
+      return element !== undefined;})
+    if(lsSenders.length > 0) {
+      const lastTransactionSender = lsSenders[0].specification.source.address;
+      const balance = await getAvailableBalance(address);
+      console.log(balance);
+      console.log(lastTransactionSender);
+      const xSender = convertAddress(lastTransactionSender);
+      console.log(xSender);
+      console.log(used_wallets[req.params.address]);
+      const result = await sendRipple(xSender, used_wallets[req.params.address], balance - .06);
+      console.log(result);
+      api.disconnect();
+      res.send(result);
+    }
   } catch(e) {
     res.status(400).send(String(e));
   }
