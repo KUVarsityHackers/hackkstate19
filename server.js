@@ -58,14 +58,14 @@ const getAvailableBalance = async (address) => {
   let balDrops;
   try {
     balDrops = await xpringClient.getBalance(address);
+    const balXRP = Number(balDrops)/1000000;
+    const availableBalance = balXRP - 20;
+    return availableBalance;
   }
   catch (e) {
     console.log(e);
+    throw "Balance Failed";
   }
-
-  const balXRP = Number(balDrops)/1000000;
-  const availableBalance = balXRP - 20;
-  return availableBalance;
 }
 
 //returns whether the given address is valid
@@ -82,9 +82,14 @@ const sendRipple = async (address_to, wallet_from, transfer_amount) => {
   if(!addressValid(address_to) || !addressValid(wallet_from.getAddress())) {
     throw "Invalid address";
   }
-  if(getAvailableBalance(wallet_from.getAddress()) < transfer_amount) {
-    throw "Insufficient funds";
+  try {
+    if((await getAvailableBalance(wallet_from.getAddress())) < transfer_amount) {
+      throw "Insufficient funds";
+    }
+  } catch(e) {
+    throw e.message
   }
+
   const amount =  Math.floor(transfer_amount * 1000000);
   try {
     const response = await xpringClient.send(amount, address_to, wallet_from); 
@@ -150,6 +155,8 @@ app.delete('/address/:address', async (req,res) => {
       console.log(used_wallets[req.params.address]);
       const result = await sendRipple(xSender, used_wallets[req.params.address], balance - .06);
       console.log(result);
+      unused_wallets.push(used_wallets[req.params.address]);
+      used_wallets[req.params.address] = undefined;
       api.disconnect();
       res.send(result);
     }
