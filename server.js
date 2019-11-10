@@ -13,6 +13,9 @@ const {RippleAPI} = require('ripple-lib');
 
 const app = express();
 
+const nocache = require('nocache');
+app.use(nocache());
+
 const remoteURL = "grpc.xpring.tech:80";
 const xpringClient = XpringClient.xpringClientWithEndpoint(remoteURL);
 
