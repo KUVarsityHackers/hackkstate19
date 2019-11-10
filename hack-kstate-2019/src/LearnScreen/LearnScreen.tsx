@@ -31,11 +31,13 @@ function LearnScreen () {
         fetch(`/session`).then(res => res.json())
                             .then(result => {
                                 setSessions(result);
+                                fetch(`/wallet`)
+                                .then(res => res.text())
+                                .then(result => {
+                                        setAddress(result); 
+                                    });
                             });
-        fetch(`/wallet`).then(res => res.text())
-            .then(result => {
-                setAddress(result); 
-            });
+
         setInterval(sessionUpdate, 5000);
 
     }, [])

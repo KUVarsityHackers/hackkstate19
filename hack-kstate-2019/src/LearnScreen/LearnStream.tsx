@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import '../App.css';
 import Stream from 'src/Stream';
 
-let sessionInterval:any;
 function LearnStream (props: any) {
     return(
         <div className="streamContainer">
