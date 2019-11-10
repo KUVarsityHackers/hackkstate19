@@ -20,7 +20,7 @@ function LearnStream (props: any) {
                 <h4 style={{color:'gray'}}>Title:</h4>
                 <h3> {props.session.title} </h3>
                 <h4 style={{color:'gray'}}>Subject:</h4>
-                <h3> {props.session. subject} </h3>
+                <h3> {props.session.subject} </h3>
             </div>
         </div>
     );
