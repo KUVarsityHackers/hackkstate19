@@ -59,13 +59,13 @@ function StreamSelect (props: any) {
             onClick={() => props.selectStream(props.sessions[i])}
         >
         <br/>
-        <h2 style={{color:"gray"}}> {props.sessions[i].instructor.name} </h2>
+        <h2 style={{color:"gray"}}>Instructor: {props.sessions[i].instructor.name} </h2>
         <hr/>
-        <h1 style={{color:"black"}}>{props.sessions[i].title}</h1>
+        <h1 style={{color:"black"}}>Title: {props.sessions[i].title}</h1>
         <hr/>
-        <h2 style={{color:"gray"}}>{props.sessions[i].subject}</h2>
+        <h2 style={{color:"gray"}}>Subject: {props.sessions[i].subject}</h2>
         <hr/>
-        <h3 style={{color:"black"}}>{props.sessions[i].price}</h3>
+        <h3 style={{color:"black"}}>{props.sessions[i].price} XRP/hr</h3>
         
         </div>
         )}
