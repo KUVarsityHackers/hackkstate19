@@ -34,6 +34,8 @@ const readInterface = readline.createInterface({
 
 readInterface.on('line', function(line) {
   const w = Wallet.generateWalletFromMnemonic(line);
+  deleteWallet(w);
+  console.log(w.getPublicKey());
   unused_wallets.push(w);
 });
 
@@ -138,11 +140,10 @@ app.get('/balance/:address', async (req,res) => {
   }
 });
 
-app.delete('/address/:address', async (req,res) => {
-  const address = convertAddress(req.params.address);
-  const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
-
+const deleteWallet = async (wallet) => {
   try {
+    const address = convertAddress(wallet.getAddress());
+    const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
     await api.connect();
     const accountInfo = await api.getAccountInfo(address);
     const txsInfo = await api.getTransactions(address, {limit:accountInfo.sequence});
@@ -151,21 +152,31 @@ app.delete('/address/:address', async (req,res) => {
     if(lsSenders.length > 0) {
       const lastTransactionSender = lsSenders[0].specification.source.address;
       const balance = await getAvailableBalance(address);
-      console.log(balance);
-      console.log(lastTransactionSender);
       const xSender = convertAddress(lastTransactionSender);
-      console.log(xSender);
-      console.log(used_wallets[req.params.address]);
-      const result = await sendRipple(xSender, used_wallets[req.params.address], balance - .06);
-      console.log(result);
-      unused_wallets.push(used_wallets[req.params.address]);
-      used_wallets[req.params.address] = undefined;
-      api.disconnect();
-      res.send(result);
+      if(balance > .11) {
+        const result = await sendRipple(xSender, wallet, balance - .1);  
+        await api.disconnect();
+        return result;
+      }
+      await api.disconnect();
     }
   } catch(e) {
-    res.status(400).send(String(e));
+    throw (String (e))
   }
+  return null;
+}
+
+app.delete('/address/:address', async (req,res) => {
+  const wallet = used_wallets[req.params.address];
+  if(wallet) {
+    try{
+      await deleteWallet(wallet);
+      unused_wallets.push(wallet);
+      used_wallets[req.params.address] = undefined;
+    }
+    catch(e) {}
+  }
+  res.send("OK");
 });
 
 app.get('/session/:sessionId/address/:address', async (req,res) => {
