@@ -6,6 +6,12 @@ import { ISession } from 'src/types';
 function StreamSelect (props: any) {
   const [activeItemIndex, setActiveItemIndex] = useState(0);
 
+  const withdraw = () => {
+    fetch(`/address/` + props.address, {
+      method: 'DELETE'
+    })
+  }
+
   let sessions : ISession[] = [
     {instructor: {name: "Andre", address: "012"}, subject: "math", title: ";)", price: "$22/hr", id: "032452"},
     {instructor: {name: "Nathan", address: "123"}, subject: "science", title: ";P", price: "$23/hr", id: "154363"},
@@ -64,6 +70,14 @@ function StreamSelect (props: any) {
         </div>
         )}
     </ItemsCarousel>
+    <div style={{display: 'flex', width: '100%', paddingTop: '5%'}}>
+      <div style={{textAlign:'left', width: '50%', marginTop: 'auto', marginBottom: 'auto'}}>
+        <button onClick={withdraw} style={{padding: '6px'}}>Withdraw Funds</button>
+      </div>
+      <div style={{float: 'right', width: '50%', textAlign: 'right'}}>
+        <h3>XRP {props.balance < 0 ? 0 : props.balance}</h3>
+      </div>
+    </div>
     </div>
   );
 }

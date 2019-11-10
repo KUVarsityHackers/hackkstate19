@@ -44,7 +44,9 @@ function LearnScreen () {
         return (
             <div className="Splash">
                 <StreamSelect selectStream={selectStream}
-                              sessions={sessions}/>
+                              sessions={sessions}
+                              address={address}
+                              balance={balance}/>
             </div>
         );
     }
