@@ -9,7 +9,7 @@ const uniqid = require('uniqid')
 const fs = require('fs');
 const readline = require('readline');
 const {Encode, Decode} = require('xrpl-tagged-address-codec')
-const RippleAPI = require('ripple-lib').RippleAPI;
+const {RippleAPI} = require('ripple-lib');
 
 const app = express();
 
@@ -126,7 +126,23 @@ app.get('/balance/:address', async (req,res) => {
 });
 
 app.delete('/address/:address', async (req,res) => {
+  const address = req.params.address;
 
+  const api = new RippleAPI({server: 'wss://s.altnet.rippletest.net'});
+
+  try {
+    await api.connect();
+    console.log('getting account info for', address);
+    const accountInfo = await api.getAccountInfo(address);
+    const transactionInfo = await api.getTransaction(accountInfo.previousAffectingTransactionID);
+    const lastTransactionSender = transactionInfo.specification.source.address;
+    const result = await sendRipple(lastTransactionSender, src_wallets[address], (await getAvailableBalance(address)) - 19.9996);
+    api.disconnect();
+    res.send(result);
+  } catch(e) {
+    console.log("Error: ", e);
+    res.status(400).send(String(e));
+  }
 });
 
 app.get('/session/:sessionId/address/:address/', async (req,res) => {
