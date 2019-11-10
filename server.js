@@ -55,9 +55,8 @@ const getAvailableBalance = async (address) => {
   if(!addressValid(address)) {
     return "Invalid address";
   }
-  let balDrops;
   try {
-    balDrops = await xpringClient.getBalance(address);
+    const balDrops = await xpringClient.getBalance(address);
     const balXRP = Number(balDrops)/1000000;
     const availableBalance = balXRP - 20;
     return availableBalance;
@@ -179,14 +178,15 @@ app.get('/session/:sessionId/address/:address/', async (req,res) => {
           await sendRipple(mySession.instructor.address, used_wallets[address], pricePerSecond);
         }
         catch(e) {
-          res.status(400).send(String(oldBalance - pricePerSecond));
+          res.status(200).send(String(oldBalance - pricePerSecond));
+          return;
         }
     }
     const newBalance = await getAvailableBalance(address);
     res.status(200).send(String(newBalance));
   }
   catch(e) {
-    res.status(400).send(String(0 - pricePerSecond));
+    res.status(200).send(String(0 - pricePerSecond));
   }
 });
 
@@ -209,5 +209,4 @@ app.listen(PORT, () => {
 });
 
 // [END app]
-
 module.exports = app;
