@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import '../App.css';
 import PageEnum from '../PageEnum';
 import useForm from "react-hook-form";
@@ -6,16 +6,18 @@ import { ISession } from 'src/types';
 import { string } from 'prop-types';
 import Stream from '../Stream'
 import EarnStream from './EarnStream';
+import QrReader from 'react-qr-reader'
+import { useState, useEffect } from 'react';
 
 let sessionId:any;
 let addressId:any;
 function EarnScreen (props: any) {
-
+    const [ code, updateCode ] = useState("");
     const { register, handleSubmit } = useForm();
     const onSubmit =  async ( {name, address, title, subject, price}:any) => {
         const convertedValues: ISession = { instructor: {
                                                         name,
-                                                        address
+                                                        address: code
                                                     },
                                             title,
                                             subject,
@@ -42,6 +44,25 @@ function EarnScreen (props: any) {
           }
     }
 
+
+    let state = {
+        result: ''
+    }
+      
+    const handleScan = (data) => {
+        if (data !== null) {
+            updateCode(data.slice(7));
+        }
+    };
+
+    const handleError = (err) => {
+        console.error(err)
+    };
+
+    const handeleCodeChange = (val) => {
+        console.log(val.target.value);
+        updateCode(val.target.value);
+    }
     if(sessionId) {
         return (<EarnStream streamId={sessionId} address={addressId}/>)
     } else {
@@ -54,10 +75,18 @@ function EarnScreen (props: any) {
                         <input className="tutorForm" placeholder="Title" name="title" ref={register}></input><br/>
                         <input className="tutorForm" placeholder="Subject" name="subject" ref={register}></input><br/>
                         <input className="tutorForm" placeholder="Price" name="price" ref={register}></input><br/>
-                        <input className="tutorForm" placeholder="Address" name="address" ref={register}></input><br/>
+                        <input className="tutorForm" placeholder="Address" name="address" onChange={(val) => handeleCodeChange(val)} value={code} ref={register}></input><br/>
                         <button type="submit" id="submit">Submit</button>
                     </form>
                 </body>
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                <QrReader
+                    delay={300}
+                    onError={handleError}
+                    onScan={handleScan}
+                    style={{ width: '70%' }}
+                />
+                </div>
             </div>
         );
     }
